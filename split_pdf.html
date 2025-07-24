@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PDF Splitter</title>
+    <!-- Font Awesome for icons (e.g., close button) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- PDF.js library for rendering PDFs in the browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script>
+        // Set the worker source for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+    </script>
+    <style>
+        /* Universal box-sizing for consistent layout */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Common styles from pdf_to_word.html for consistency */
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', sans-serif;
+            color: #000;
+            background: #fff;
+            text-align: center;
+            /* Removed padding from body to allow header/footer to span full width */
+            display: flex; /* Use flexbox for overall layout */
+            flex-direction: column; /* Stack children vertically */
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+            overflow: auto; /* Allow scrolling if content overflows */
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 50px; /* Decreased vertical padding from 15px to 10px */
+            background-color: #000;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            /* Removed negative margin as it's no longer needed with body padding removed */
+            width: 100%; /* Ensure header takes full width */
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .navbar .right-nav-group {
+            display: flex;
+            align-items: center; /* This aligns the items themselves */
+            gap: 15px; /* Slightly reduced gap from 20px to 15px */
+        }
+        .navbar .right-nav-group a {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 12px; /* Slightly reduced horizontal padding from 15px to 12px */
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent text from wrapping */
+            transition: border-color 0.3s ease, transform 0.2s ease;
+
+            /* Ensure internal content is centered for perfect alignment */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Include padding in element's total width/height */
+        }
+        .navbar .right-nav-group a:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .navbar .login-button {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 12px; /* Made padding consistent with other links */
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent text from wrapping */
+            transition: border-color 0.3s ease, transform 0.2s ease;
+
+            /* Ensure internal content is centered for perfect alignment */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Include padding in element's total width/height */
+        }
+        .navbar .login-button:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #000; /* Black background */
+            color: #fff;
+            padding: 30px 50px;
+            text-align: center;
+            position: relative; /* Needed for absolute positioning of the flag */
+            overflow: hidden; /* Hide anything that overflows */
+            /* Removed negative margin as it's no longer needed with body padding removed */
+            width: 100%; /* Ensure footer takes full width */
+        }
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer .footer-links {
+            margin-top: 15px;
+        }
+        .footer .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .footer .footer-links a:hover {
+            color: #e53935;
+        }
+
+        /* Sri Lankan Flag Styling */
+        .sri-lankan-flag {
+            position: absolute;
+            top: auto;
+            bottom: 35px; /* Adjust as needed for spacing from bottom */
+            right: 20px; /* Adjust as needed for spacing from right */
+            width: 60px; /* Flag width */
+            height: 30px; /* Flag height (approx 2:1 ratio) */
+            border: 1px solid #ccc; /* Small border for definition */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
+            z-index: 10; /* Ensure it's above other footer content if needed */
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                padding: 10px 20px; /* Adjusted for smaller screens too */
+                /* Removed negative margin */
+            }
+            .navbar .logo {
+                font-size: 22px;
+            }
+            .footer {
+                padding: 20px 20px;
+                /* Removed negative margin */
+            }
+            .navbar .right-nav-group {
+                flex-grow: 1;
+                justify-content: flex-end;
+            }
+        }
+        @media (max-width: 576px) {
+            .navbar {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 8px 15px; /* Adjusted for smaller screens even more */
+                /* Removed negative margin */
+            }
+            .navbar .right-nav-group a,
+            .navbar .login-button {
+                flex-grow: 1;
+                text-align: center;
+            }
+            .footer {
+                padding: 15px 15px;
+                /* Removed negative margin */
+            }
+            .footer .footer-links a {
+                display: block;
+                margin: 5px 0;
+            }
+            .sri-lankan-flag {
+                width: 40px;
+                height: 20px;
+                bottom: 5px;
+                right: 5px;
+            }
+        }
+
+        /* Main content and card styling */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Added horizontal padding to main instead of body */
+            padding: 50px 1em; /* Adjusted to 1em for consistency with original body padding */
+            gap: 20px;
+            width: 100%; /* Ensure main takes full width */
+        }
+
+        .card {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        /* Styling for the file input and its label */
+        .file-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            width: 100%; /* Ensure it takes full width of the card */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px; /* Minimum height for better drop zone */
+        }
+
+        .file-upload-area.drag-over {
+            border-color: #007bff;
+            background-color: #e6f2ff;
+        }
+
+        .file-upload-area input[type="file"] {
+            display: none; /* Hide the default file input */
+        }
+
+        .file-upload-area label {
+            font-size: 1em; /* Adjusted font size */
+            color: #555;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .file-upload-area .upload-icon {
+            font-size: 2em;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        #file-name-display {
+            font-size: 0.9em;
+            color: #333;
+            margin-top: 5px;
+            word-break: break-all; /* Ensures long filenames wrap */
+        }
+
+        #splitButton {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px; /* Increased padding for consistency with other buttons */
+            border-radius: 6px;
+            font-size: 1em; /* Increased font size for consistency */
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: normal;
+            box-shadow: none;
+            margin-top: 15px; /* Added margin-top to separate from file upload */
+            width: 100%; /* Make button full width */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        #splitButton:hover {
+            background-color: #0056b3;
+            transform: none;
+            box-shadow: none;
+        }
+        #splitButton:active {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .back-to-home-btn {
+            background-color: #070707;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 40px auto; /* Centered horizontally, with top/bottom margin */
+        }
+
+        .back-to-home-btn:hover {
+            background-color: #666;
+        }
+
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fcfcfc;
+        }
+        .thumbnail-container {
+            position: relative;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 5px;
+        }
+        .thumbnail-container.removed {
+            opacity: 0.5;
+            border-color: #ff6b6b;
+            background-color: #ffebeb;
+        }
+        .thumbnail-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .thumbnail-container canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            z-index: 10;
+        }
+        .close-btn:hover {
+            background-color: rgba(255, 0, 0, 1);
+        }
+        .page-number {
+            font-size: 0.85em;
+            color: #555;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        #loading-indicator {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6e7dff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Message display area */
+        #message-display {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            display: none; /* Hidden by default */
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #message-display.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        #message-display.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* New styles for the main topic line */
+        .main-topic-line {
+            text-align: center;
+            margin-top: 30px; /* Space from navbar */
+            margin-bottom: 10px; /* Space before the SEO heading */
+        }
+
+        .main-topic-line h1 {
+            font-size: 2.5em; /* Bigger font size */
+            font-weight: bold;
+            color: #000; /* Black color */
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-topic-line h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-topic-line h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        /* SEO heading styles */
+        .seo-heading-container {
+            text-align: center;
+            padding: 10px 10px; /* Further reduced padding */
+            margin-top: 10px; /* Further reduced margin from navbar */
+            margin-bottom: 10px; /* Further reduced margin from main content */
+            max-width: 800px; /* Increased max-width for longer lines */
+            width: 100%;
+            box-sizing: border-box;
+            /* Ensure the container itself is centered */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .seo-heading-container h1 {
+            font-size: 16.5px; /* Even smaller font size for desktop */
+            color: #333;
+            margin: 0;
+            line-height: 1.2; /* Adjusted line height */
+            font-weight: normal; /* Changed to normal (not bold) */
+            text-align: center; /* Ensure text itself is centered within the h1 */
+        }
+
+        @media (max-width: 768px) {
+            .seo-heading-container h1 {
+                font-size: 1.1em; /* Smaller font size for tablets */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .seo-heading-container h1 {
+                font-size: 0.9em; /* Even smaller font size for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+       <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+           <a href="{{ url_for('ai_page') }}">AI</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+
+    <!-- New Main Topic Line -->
+    <div class="main-topic-line">
+        <h1>Split PDF</h1>
+    </div>
+
+    <!-- SEO Heading Section -->
+    <div class="seo-heading-container">
+        <h1>Split PDF files into individual pages or extract specific pages. Easily divide large PDF documents and download selected pages. Fast, secure, and free PDF splitter.</h1>
+    </div>
+
+    <main>
+        <div class="card">
+            <h2>Split PDF</h2>
+            <form id="pdfForm" method="POST" enctype="multipart/form-data" class="w-full flex flex-col items-center">
+                <div id="fileUploadArea" class="file-upload-area">
+                    <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <label for="pdf_file">Drag & Drop your PDF here or Click to Upload</label>
+                    <span id="file-name-display">No file chosen</span>
+                </div>
+
+                <!-- Hidden input to store selected page numbers -->
+                <input type="hidden" id="pagesToKeep" name="pages">
+
+                <button type="submit" id="splitButton">Split PDF</button>
+            </form>
+        </div>
+
+        <div id="message-display"></div> <!-- Message display area -->
+
+        <div id="loading-indicator" class="mt-5">
+            <div class="spinner"></div>
+            <p>Loading PDF pages...</p>
+        </div>
+
+        <div id="thumbnailContainer" class="thumbnail-grid mt-5">
+            <!-- PDF page thumbnails will be rendered here -->
+        </div>
+
+        <a href="{{ url_for('home') }}" class="back-to-home-btn">Back to Home</a>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Fixway PDF. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="{{ url_for('contact_page') }}">Contact Us</a>
+        </div>
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+
+    <script>
+        const pdfFileInput = document.getElementById('pdf_file');
+        const thumbnailContainer = document.getElementById('thumbnailContainer');
+        const pagesToKeepInput = document.getElementById('pagesToKeep');
+        const pdfForm = document.getElementById('pdfForm');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const splitButton = document.getElementById('splitButton');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const messageDisplay = document.getElementById('message-display');
+
+        let activePageIndices = []; // Stores 0-indexed page numbers that are currently selected
+
+        // Event Listeners
+        pdfFileInput.addEventListener('change', handleFileSelect);
+        pdfForm.addEventListener('submit', handleSubmit);
+
+        // Drag and Drop Event Listeners
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('drag-over');
+        });
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('drag-over');
+        });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                pdfFileInput.files = files; // Assign dropped files to the input
+                handleFileSelect({ target: pdfFileInput }); // Trigger the change handler
+            }
+        });
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                fileNameDisplay.textContent = 'No file chosen';
+                thumbnailContainer.innerHTML = '';
+                activePageIndices = [];
+                splitButton.disabled = true;
+                showMessage('Please select a PDF file.', 'error');
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                fileNameDisplay.textContent = 'No file chosen';
+                pdfFileInput.value = ''; // Clear the input
+                thumbnailContainer.innerHTML = '';
+                activePageIndices = [];
+                splitButton.disabled = true;
+                showMessage('Invalid file type. Please upload a PDF file.', 'error');
+                return;
+            }
+
+            fileNameDisplay.textContent = file.name;
+            showMessage(`File selected: ${file.name}`, 'success');
+
+            loadingIndicator.style.display = 'flex'; // Show loading indicator
+            thumbnailContainer.innerHTML = ''; // Clear previous thumbnails
+            splitButton.disabled = true; // Disable split button during loading
+            messageDisplay.style.display = 'none'; // Hide messages during loading
+
+            const fileReader = new FileReader();
+            fileReader.onload = async () => {
+                const typedArray = new Uint8Array(fileReader.result);
+                try {
+                    const pdf = await pdfjsLib.getDocument(typedArray).promise;
+                    renderPdfThumbnails(pdf);
+                    showMessage(`PDF loaded successfully. Select pages to split.`, 'info'); /* Changed to info */
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                    thumbnailContainer.innerHTML = '';
+                    activePageIndices = [];
+                    splitButton.disabled = true;
+                    showMessage('Failed to load PDF. Please ensure it is a valid PDF file.', 'error');
+                } finally {
+                    loadingIndicator.style.display = 'none'; // Hide loading indicator
+                }
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        async function renderPdfThumbnails(pdf) {
+            thumbnailContainer.innerHTML = ''; // Clear existing thumbnails
+            activePageIndices = []; // Reset active pages
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                activePageIndices.push(i - 1); // Add all pages initially (0-indexed)
+
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 0.75 });
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport,
+                };
+                await page.render(renderContext).promise;
+
+                const container = document.createElement('div');
+                container.classList.add('thumbnail-container');
+                container.dataset.pageIndex = i - 1; // Store 0-indexed page number
+
+                const closeButton = document.createElement('button');
+                closeButton.classList.add('close-btn');
+                closeButton.innerHTML = '<i class="fas fa-times"></i>'; // Font Awesome 'x' icon
+                closeButton.title = 'Remove page';
+                closeButton.addEventListener('click', () => togglePageRemoval(container, i - 1));
+
+                const pageNumberLabel = document.createElement('span');
+                pageNumberLabel.classList.add('page-number');
+                pageNumberLabel.textContent = `Page ${i}`;
+
+                container.appendChild(canvas);
+                container.appendChild(closeButton);
+                container.appendChild(pageNumberLabel);
+                thumbnailContainer.appendChild(container);
+            }
+            updateSplitButtonState(); /* Call to update button state after rendering */
+        }
+
+        function togglePageRemoval(container, pageIndex) {
+            if (container.classList.contains('removed')) {
+                // Page is currently removed, re-add it
+                container.classList.remove('removed');
+                activePageIndices.push(pageIndex);
+            } else {
+                // Page is currently active, remove it
+                container.classList.add('removed');
+                activePageIndices = activePageIndices.filter(index => index !== pageIndex);
+            }
+            // Sort to ensure consistent order for backend
+            activePageIndices.sort((a, b) => a - b);
+            updateSplitButtonState();
+        }
+
+        function updateSplitButtonState() {
+            // Enable split button only if at least one page is selected AND a file is loaded
+            splitButton.disabled = activePageIndices.length === 0 || !pdfFileInput.files.length;
+            if (activePageIndices.length === 0 && pdfFileInput.files.length > 0) {
+                showMessage('No pages selected. Please select at least one page to split.', 'error');
+            } else if (pdfFileInput.files.length > 0) {
+                messageDisplay.style.display = 'none'; // Hide error if pages are selected
+            }
+        }
+
+        function handleSubmit(event) {
+            // Prevent default form submission
+            event.preventDefault();
+
+            if (activePageIndices.length === 0) {
+                showMessage('Please select at least one page to split.', 'error');
+                return;
+            }
+
+            // Convert 0-indexed activePageIndices to 1-indexed comma-separated string for backend
+            const pagesToSubmit = activePageIndices.map(index => index + 1).join(',');
+            pagesToKeepInput.value = pagesToSubmit;
+
+            // Now submit the form programmatically
+            pdfForm.submit();
+        }
+
+        // Function to display messages
+        function showMessage(message, type) {
+            messageDisplay.textContent = message;
+            messageDisplay.className = ''; // Clear existing classes
+            messageDisplay.classList.add('message-display', type);
+            messageDisplay.style.display = 'block'; // Show the message
+        }
+
+        // Initialize button state and message on page load
+        updateSplitButtonState();
+        showMessage('Upload a PDF to get started.', 'info'); // Initial instruction message
+    </script>
+</body>
+</html>

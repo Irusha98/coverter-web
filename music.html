@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Audio/Video Trimmer with Fade (Keep Region)</title>
+  <meta name="description" content="Trim audio files and add fade in/out effects easily with Fixway's online audio trimmer. No downloads required — free, fast, and secure.">
+    <meta name="keywords" content="audio trimmer, fade audio, trim mp3 online, fade in fade out, cut audio, audio editor, online audio cutter, Fixway music tools">
+    <meta name="author" content="Fixway IT Solutions">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://unpkg.com/wavesurfer.js@6.6.3/dist/wavesurfer.min.js?v=20250703_03"></script>
+  <script src="https://unpkg.com/wavesurfer.js@6.6.3/dist/plugin/wavesurfer.regions.min.js?v=20250703_03"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Styles from files_to_archiver.html for consistency */
+    /* Universal box-sizing for consistent layout */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    /* Common styles for body, header, and footer for consistency */
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif; /* Keep Inter font */
+        color: #000;
+        background: #fff;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow: auto;
+    }
+    .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1px 50px; /* Decreased vertical padding from 15px to 10px */
+            background-color: #000;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 0 -20px; /* Adjust if body padding is kept */
+            padding-left: calc(20px + 30px);
+            padding-right: calc(20px + 30px);
+            height: 60px;
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none; /* Ensure it doesn't look like a standard link */
+        }
+        /* SEO heading styles */
+        .seo-heading-container {
+            text-align: center;
+            padding: 10px 10px; /* Further reduced padding */
+            margin-top: 10px; /* Further reduced margin from navbar */
+            margin-bottom: 10px; /* Further reduced margin from main content */
+            max-width: 800px; /* Increased max-width for longer lines */
+            width: 100%;
+            box-sizing: border-box;
+            /* Ensure the container itself is centered */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .seo-heading-container h1 {
+            font-size: 16.5px; /* Even smaller font size for desktop */
+            color: #333;
+            margin: 0;
+            line-height: 1.2; /* Adjusted line height */
+            font-weight: normal; /* Changed to normal (not bold) */
+            text-align: center; /* Ensure text itself is centered within the h1 */
+        }
+
+        @media (max-width: 768px) {
+            .seo-heading-container h1 {
+                font-size: 1.1em; /* Smaller font size for tablets */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .seo-heading-container h1 {
+                font-size: 0.9em; /* Even smaller font size for mobile */
+            }
+        }
+
+        /* New styles for the main topic line */
+        .main-topic-line {
+            text-align: center;
+            margin-top: 30px; /* Space from navbar */
+            margin-bottom: 10px; /* Space before the SEO heading */
+        }
+
+        .main-topic-line h1 {
+            font-size: 2.5em; /* Bigger font size */
+            font-weight: bold;
+            color: #000; /* Black color */
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-topic-line h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-topic-line h1 {
+                font-size: 1.8em;
+            }
+        }
+        .navbar .right-nav-group {
+            display: flex;
+            align-items: center; /* This aligns the items themselves */
+            gap: 15px; /* Slightly reduced gap from 20px to 15px */
+        }
+        .navbar .right-nav-group a {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 12px; /* Slightly reduced horizontal padding from 15px to 12px */
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent text from wrapping */
+            transition: border-color 0.3s ease, transform 0.2s ease;
+
+            /* Ensure internal content is centered for perfect alignment */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Include padding in element's total width/height */
+        }
+        .navbar .right-nav-group a:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+         .navbar .login-button {
+        background-color: #000000;
+        color: #fff;
+        width: 70px;
+        height: 0px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: border-color 0.3s ease, transform 0.2s ease;
+        padding-bottom: 20px;
+        bottom: 4ch;
+        }
+        .navbar .login-button:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+    .footer {
+        background-color: #000;
+        color: #fff;
+        padding: 30px 50px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+    .footer p {
+        margin: 0;
+        font-size: 14px;
+    }
+    .footer .footer-links {
+        margin-top: 15px;
+    }
+    .footer .footer-links a {
+        color: #fff;
+        text-decoration: none;
+        margin: 10px;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+    .footer .footer-links a:hover {
+        color: #e53935;
+    }
+    .sri-lankan-flag {
+        position: absolute;
+        bottom: 35px;
+        right: 20px;
+        width: 60px;
+        height: 30px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 10;
+    }
+    @media (max-width: 700px) {
+        .navbar { padding: 10px 20px; }
+        .navbar .logo { font-size: 22px; }
+        .footer { padding: 20px 20px; }
+        .navbar .right-nav-group { flex-grow: 1; justify-content: flex-end; }
+    }
+    @media (max-width: 576px) {
+        .navbar { flex-wrap: wrap; justify-content: center; padding: 8px 15px; }
+        .navbar .right-nav-group a, .navbar .login-button { flex-grow: 1; text-align: center; }
+        .footer { padding: 15px 15px; }
+        .footer .footer-links a { display: block; margin: 5px 0; }
+        .sri-lankan-flag { width: 40px; height: 20px; bottom: 5px; right: 5px; }
+    }
+
+    /* Main content styling - adapted for music.html */
+    main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px 1em;
+        gap: 20px;
+        width: 100%;
+    }
+    .card {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        max-width: 800px; /* Adjusted max-width for audio editor */
+        width: 100%;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .card h1 { /* Adjusted from h2 to h1 for main title */
+        margin-bottom: 20px;
+        font-size: 2.2em; /* Adjusted font size */
+        color: #333;
+    }
+
+    /* Back to Home Button */
+    .back-to-home-btn {
+        background-color: #000;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin: 40px auto;
+    }
+    .back-to-home-btn:hover {
+        background-color: #333;
+    }
+
+    /* Message display area */
+    #message-display {
+        margin-top: 20px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 0.95em;
+        font-weight: 500;
+        display: none;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+    #message-display.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    #message-display.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    #message-display.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    #loading-indicator {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        color: #555;
+        font-size: 1.1em;
+        font-weight: 500;
+        margin-top: 20px;
+    }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: #007bff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Login Modal Styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1001; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+        backdrop-filter: blur(5px); /* Frosted glass effect */
+        -webkit-backdrop-filter: blur(5px); /* Safari support */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        width: 90%;
+        max-width: 400px;
+        position: relative;
+        animation: fadeIn 0.3s ease-out;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .close-button {
+        color: #aaa;
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: #333;
+        text-decoration: none;
+    }
+
+    .modal-content h3 {
+        font-size: 1.8em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #ddd;
+        color: #333;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        text-decoration: none; /* For anchor tags */
+    }
+
+    .social-btn.google {
+        background-color: #DB4437;
+        color: white;
+        border-color: #DB4437;
+    }
+    .social-btn.google:hover {
+        background-color: #C1352A;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .social-btn.facebook {
+        background-color: #4267B2;
+        color: white;
+        border-color: #4267B2;
+    }
+    .social-btn.facebook:hover {
+        background-color: #365899;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .social-btn i {
+        font-size: 1.2em;
+    }
+
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #888;
+        margin: 20px 0;
+    }
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+    }
+    .separator:not(:empty)::before {
+        margin-right: .5em;
+    }
+    .separator:not(:empty)::after {
+        margin-left: .5em;
+    }
+
+    .modal-content input[type="email"],
+    .modal-content input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1em;
+    }
+
+    .modal-content button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+    }
+    .modal-content button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    #loginStatus {
+        margin-top: 15px;
+        font-size: 0.9em;
+        color: #555;
+    }
+    #loginStatus.error {
+        color: #dc2626;
+    }
+    #loginStatus.success {
+        color: #16a34a;
+    }
+
+    /* Specific to music.html existing styles */
+    #waveform {
+      width: 100%;
+      height: 120px;
+      background-color: #f0f0f0;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .wavesurfer-region {
+      background-color: rgba(173, 216, 230, 0.5) !important;
+      cursor: move !important;
+    }
+    .wavesurfer-handle {
+      background-color: #000000 !important;
+      width: 9px !important;
+      border-radius: 4px !important;
+      border: 2px solid #333333 !important;
+      cursor: ew-resize !important;
+    }
+    /* Renamed from .message-box to .tool-message-box to avoid conflict with modal's .message-box */
+    .tool-message-box {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .tool-message-box.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+            <a href="{{ url_for('ai_page') }}">AI</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+     <!-- New Main Topic Line -->
+    <div class="main-topic-line">
+        <h1>Music track trim </h1>
+    </div>
+
+    <!-- SEO Heading Section -->
+    <div class="seo-heading-container">
+        <h1>rim audio files and add fade in/out effects easily with Fixway's online audio trimmer. No downloads required — free, fast, and secure.</h1>
+    </div>
+
+
+    <main>
+        <div class="card">
+            <h1>Audio/Video Trimmer with Fade (Keep Region)</h1>
+
+            <div class="mb-6">
+                <label
+                for="audioFile"
+                class="block text-gray-700 text-sm font-medium mb-2"
+                >Upload Audio/Video File:</label
+                >
+                <input
+                type="file"
+                id="audioFile"
+                accept="audio/*,video/*"
+                class="block w-full text-sm text-gray-600
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-gray-200 file:text-gray-800
+                                hover:file:bg-gray-300 cursor-pointer"
+                />
+            </div>
+
+            <div
+                id="loadingIndicator"
+                class="hidden text-center text-gray-600 mb-4"
+            >
+                <svg
+                class="animate-spin h-6 w-6 text-gray-700 inline-block mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                >
+                <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                ></circle>
+                <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+                </svg>
+                Processing audio... Please wait.
+            </div>
+
+            <div id="waveform" class="mb-6 rounded-lg"></div>
+
+            <div
+                class="flex flex-wrap justify-center gap-4 mb-6"
+            >
+                <button
+                id="playPauseBtn"
+                title="Play/Pause"
+                class="bg-black hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                disabled
+                >
+                <svg
+                    id="playIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                >
+                    <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14.752 11.168l-6.518-3.75A.75.75 0 007 8.75v6.5a.75.75 0 001.234.646l6.518-3.75a.75.75 0 000-1.298z"
+                    />
+                </svg>
+                <svg
+                    id="pauseIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    class="w-5 h-5 hidden"
+                >
+                    <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 9v6m4-6v6"
+                    />
+                </svg>
+                <span id="playPauseText">Play</span>
+                </button>
+                <button
+                id="resetBtn"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+                >
+                Reset
+                </button>
+                <button
+                id="trimBtn"
+                class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+                >
+                Trim
+                </button>
+            </div>
+
+            <div
+                class="flex flex-wrap justify-center gap-4 mb-6 items-center"
+            >
+                <label
+                for="fadeDuration"
+                class="text-gray-800 text-sm font-medium"
+                >Fade Duration (seconds):</label
+                >
+                <select
+                id="fadeDuration"
+                class="p-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="1.5">1.5</option>
+                <option value="2">2</option>
+                <option value="2.5">2.5</option>
+                <option value="3" selected>3</option>
+                <option value="3.5">3.5</option>
+                <option value="4">4</option>
+                <option value="4.5">4.5</option>
+                <option value="5">5</option>
+                </select>
+
+                <button
+                id="fadeInBtn"
+                class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+                >
+                Fade In
+                </button>
+                <button
+                id="fadeOutBtn"
+                class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+                >
+                Fade Out
+                </button>
+            </div>
+
+            <div
+                class="flex justify-center items-center gap-6 mb-6 text-gray-800 text-lg font-medium"
+            >
+                <p>Start: <span id="startTimeDisplay">00:00.000</span></p>
+                <p>End: <span id="endTimeDisplay">00:00.000</span></p>
+            </div>
+
+            <div
+                class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6"
+            >
+                <select
+                id="outputFormat"
+                class="block w-full sm:w-auto p-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+                >
+                <option value="mp3">MP3</option>
+                <option value="wav" selected>WAV</option>
+                <option value="m4a">M4A</option>
+                <option value="mp4">MP4 (Video)</option>
+                </select>
+                <button
+                id="downloadProcessedBtn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full shadow-md transition duration-300 ease-in-out w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+                >
+                Download Processed Audio
+                </button>
+            </div>
+        </div>
+
+        <a href="/" class="back-to-home-btn">Back to Home</a>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Fixway PDF. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="{{ url_for('contact_page') }}">Contact Us</a>
+        </div>
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3>Login to Fixway</h3>
+
+            <button class="social-btn google" id="googleLoginBtn">
+                <i class="fab fa-google"></i> Continue with Google
+            </button>
+            <button class="social-btn facebook" id="facebookLoginBtn">
+                <i class="fab fa-facebook-f"></i> Continue with Facebook
+            </button>
+
+            <div class="separator">OR</div>
+
+            <input type="email" id="loginEmail" placeholder="Email address">
+            <input type="password" id="loginPassword" placeholder="Password">
+
+            <button type="submit" id="emailLoginBtn">Log In</button>
+            <div id="loginStatus"></div>
+        </div>
+    </div>
+    <div id="toolMessageBox" class="tool-message-box"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script>
+        // Firebase Configuration (REPLACE WITH YOUR ACTUAL CONFIG)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Get modal elements
+        const loginModal = document.getElementById('loginModal');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const loginStatusDiv = document.getElementById('loginStatus');
+
+        // Functions to open and close the modal
+        function openModal() {
+            loginModal.style.display = 'flex'; // Use flex to center
+            loginStatusDiv.textContent = ''; // Clear previous messages
+        }
+
+        function closeModal() {
+            loginModal.style.display = 'none';
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            if (event.target == loginModal) {
+                closeModal();
+            }
+        }
+
+        // Firebase Login Handlers
+        googleLoginBtn.addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                loginStatusDiv.textContent = 'Logged in with Google successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Google login error:", error);
+                loginStatusDiv.textContent = `Google login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        facebookLoginBtn.addEventListener('click', async () => {
+            const provider = new firebase.auth.FacebookAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                loginStatusDiv.textContent = 'Logged in with Facebook successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Facebook login error:", error);
+                loginStatusDiv.textContent = `Facebook login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        emailLoginBtn.addEventListener('click', async () => {
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+
+            if (!email || !password) {
+                loginStatusDiv.textContent = 'Please enter both email and password.';
+                loginStatusDiv.className = 'error';
+                return;
+            }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                loginStatusDiv.textContent = 'Logged in successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Email/Password login error:", error);
+                loginStatusDiv.textContent = `Login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        // Existing script for music.html below this
+        const audioFile = document.getElementById("audioFile");
+        const waveformDiv = document.getElementById("waveform");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const trimBtn = document.getElementById("trimBtn");
+        const fadeInBtn = document.getElementById("fadeInBtn");
+        const fadeOutBtn = document.getElementById("fadeOutBtn");
+        const downloadProcessedBtn = document.getElementById("downloadProcessedBtn");
+        const startTimeDisplay = document.getElementById("startTimeDisplay");
+        const endTimeDisplay = document.getElementById("endTimeDisplay");
+        const outputFormatSelect = document.getElementById("outputFormat");
+        const fadeDurationSelect = document.getElementById("fadeDuration");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        // Renamed messageBox to toolMessageBox
+        const toolMessageBox = document.getElementById("toolMessageBox");
+        const playIcon = document.getElementById("playIcon");
+        const pauseIcon = document.getElementById("pauseIcon");
+        const playPauseText = document.getElementById("playPauseText");
+
+        let wavesurfer = null;
+        let regionsPlugin = null;
+        let region = null;
+        let originalFile = null;
+        let currentProcessedBlob = null;
+        let currentFileName = "audio.wav";
+        let processedFileDownloadUrl = null;
+        let processedFileName = null;
+        let audioContext = null;
+
+        // Renamed function to avoid conflict with modal's showMessage
+        function showToolMessage(message, type = "info") {
+            toolMessageBox.textContent = message;
+            toolMessageBox.className = "tool-message-box show";
+            if (type === "error") {
+                toolMessageBox.style.backgroundColor = "#dc2626";
+            } else if (type === "success") {
+                toolMessageBox.style.backgroundColor = "#16a34a";
+            } else {
+                toolMessageBox.style.backgroundColor = "#333";
+            }
+            setTimeout(() => {
+                toolMessageBox.classList.remove("show");
+            }, 3000);
+        }
+
+        function setControlsEnabled(enabled) {
+            playPauseBtn.disabled = !enabled;
+            resetBtn.disabled = !enabled;
+            trimBtn.disabled = !enabled;
+            fadeInBtn.disabled = !enabled;
+            fadeOutBtn.disabled = !enabled;
+            outputFormatSelect.disabled = !enabled;
+            fadeDurationSelect.disabled = !enabled;
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const milliseconds = Math.floor((remainingSeconds - Math.floor(remainingSeconds)) * 1000);
+            return `${String(minutes).padStart(2, "0")}:${String(Math.floor(remainingSeconds)).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`;
+        }
+
+        function updateTimeDisplays(start, end) {
+            startTimeDisplay.textContent = formatTime(start);
+            endTimeDisplay.textContent = formatTime(end);
+        }
+
+        function initializeWaveSurfer() {
+            if (wavesurfer && typeof wavesurfer.destroy === "function") {
+                wavesurfer.destroy();
+                regionsPlugin = null;
+            }
+
+            wavesurfer = WaveSurfer.create({
+                container: waveformDiv,
+                waveColor: "#cccccc",
+                progressColor: "#000000",
+                cursorColor: "#333333",
+                barWidth: 3,
+                barRadius: 3,
+                barGap: 1,
+                minPxPerSec: 50,
+                height: 120,
+                plugins: [WaveSurfer.regions.create()],
+            });
+
+            regionsPlugin = wavesurfer.regions;
+
+            wavesurfer.on("play", () => {
+                playIcon.classList.add("hidden");
+                pauseIcon.classList.remove("hidden");
+                playPauseText.textContent = "Pause";
+            });
+
+            wavesurfer.on("pause", () => {
+                playIcon.classList.remove("hidden");
+                pauseIcon.classList.add("hidden");
+                playPauseText.textContent = "Play";
+            });
+
+            wavesurfer.on("finish", () => {
+                playIcon.classList.remove("hidden");
+                pauseIcon.classList.add("hidden");
+                playPauseText.textContent = "Play";
+                wavesurfer.seekTo(0);
+            });
+
+            wavesurfer.on("region-update-end", (updatedRegion) => {
+                if (updatedRegion === region) {
+                    updateTimeDisplays(region.start, region.end);
+                }
+            });
+
+            wavesurfer.on("region-created", (newRegion) => {
+                if (region && region !== newRegion) {
+                    region.remove();
+                }
+                region = newRegion;
+                updateTimeDisplays(region.start, region.end);
+            });
+
+            wavesurfer.on("region-removed", (removedRegion) => {
+                if (removedRegion === region) {
+                    region = null;
+                    updateTimeDisplays(0, 0);
+                    downloadProcessedBtn.disabled = true;
+                    processedFileDownloadUrl = null;
+                    processedFileName = null;
+                }
+            });
+        }
+
+        function loadAudioFileIntoWavesurfer(fileOrBlob, filename = "audio.wav") {
+            initializeWaveSurfer();
+
+            loadingIndicator.classList.remove("hidden");
+            setControlsEnabled(false);
+
+            const objectURL = URL.createObjectURL(fileOrBlob);
+
+            wavesurfer.once("ready", () => {
+                if (regionsPlugin && typeof regionsPlugin.add === "function") {
+                    regionsPlugin.clear();
+                    let start = 0;
+                    let end = wavesurfer.getDuration();
+
+                    region = regionsPlugin.add({
+                        start: start,
+                        end: end,
+                        resize: true,
+                        drag: true,
+                        color: "rgba(173, 216, 230, 0.5)",
+                    });
+                    updateTimeDisplays(region.start, region.end);
+                } else {
+                    showToolMessage("Error: Region functionality not available.", "error");
+                }
+                loadingIndicator.classList.add("hidden");
+                setControlsEnabled(true);
+            });
+
+            wavesurfer.load(objectURL);
+
+            wavesurfer.on("destroy", () => {
+                URL.revokeObjectURL(objectURL);
+            });
+        }
+
+        audioFile.addEventListener("change", () => {
+            if (!audioFile.files || audioFile.files.length === 0) return;
+
+            const file = audioFile.files[0];
+
+            if (!file.type.startsWith("audio/") && !file.type.startsWith("video/")) {
+                showToolMessage("Please upload an audio or video file.", "error");
+                return;
+            }
+
+            if (file.type.startsWith("video/")) {
+                showToolMessage("Video files are supported, but only the audio track will be processed. To trim video, please use a dedicated video editor.", "info");
+            }
+
+            originalFile = file;
+            currentProcessedBlob = file;
+            currentFileName = file.name;
+
+            loadAudioFileIntoWavesurfer(originalFile);
+        });
+
+        playPauseBtn.addEventListener("click", () => {
+            if (!wavesurfer) return;
+            if (wavesurfer.isPlaying()) {
+                wavesurfer.pause();
+            } else {
+                wavesurfer.play();
+            }
+        });
+
+        resetBtn.addEventListener("click", () => {
+            if (!originalFile) {
+                showToolMessage("No original file to reset to. Please upload a file first.", "info");
+                return;
+            }
+            loadAudioFileIntoWavesurfer(originalFile, originalFile.name);
+            currentProcessedBlob = originalFile;
+            processedFileDownloadUrl = null;
+            processedFileName = null;
+            downloadProcessedBtn.disabled = true;
+            showToolMessage("Waveform reset to original file.", "success");
+        });
+
+        async function processAudioOnServer(endpoint, operationType) {
+            if (!currentProcessedBlob || !region) {
+                showToolMessage("Please load an audio file and select a region first.", "error");
+                return;
+            }
+
+            loadingIndicator.classList.remove("hidden");
+            setControlsEnabled(false);
+            wavesurfer.pause();
+            downloadProcessedBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append("audio_file", currentProcessedBlob);
+            formData.append("start_time", region.start);
+            formData.append("end_time", region.end);
+            formData.append("output_format", outputFormatSelect.value);
+
+            if (operationType === "fadeIn" || operationType === "fadeOut") {
+                formData.append("fade_type", operationType === "fadeIn" ? "in" : "out");
+                formData.append("fade_duration_ms", parseFloat(fadeDurationSelect.value) * 1000);
+            }
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success && data.download_url && data.filename) {
+                    processedFileDownloadUrl = data.download_url;
+                    processedFileName = data.filename;
+
+                    const processedAudioResponse = await fetch(processedFileDownloadUrl);
+                    if (!processedAudioResponse.ok) {
+                        throw new Error(`Failed to fetch processed audio for preview: ${processedAudioResponse.status} ${processedAudioResponse.statusText}`);
+                    }
+                    const processedAudioBlob = await processedAudioResponse.blob();
+
+                    currentProcessedBlob = processedAudioBlob;
+
+                    loadAudioFileIntoWavesurfer(processedAudioBlob, processedFileName);
+
+                    downloadProcessedBtn.disabled = false;
+                    showToolMessage("Audio processed successfully! Previewing. Click 'Download Processed Audio' to get the file.", "success");
+
+                } else {
+                    throw new Error(data.error || "Unknown server response.");
+                }
+
+            } catch (error) {
+                console.error("Error processing audio on server:", error);
+                showToolMessage(`Error processing audio: ${error.message}`, "error");
+            } finally {
+                loadingIndicator.classList.add("hidden");
+                setControlsEnabled(true);
+            }
+        }
+
+        trimBtn.addEventListener("click", () => processAudioOnServer("/music", "trim"));
+        fadeInBtn.addEventListener("click", () => processAudioOnServer("/fade_audio", "fadeIn"));
+        fadeOutBtn.addEventListener("click", () => processAudioOnServer("/fade_audio", "fadeOut"));
+
+        downloadProcessedBtn.addEventListener("click", () => {
+            if (processedFileDownloadUrl && processedFileName) {
+                const a = document.createElement("a");
+                a.href = processedFileDownloadUrl;
+                a.download = processedFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToolMessage("Processed audio download started!", "success");
+            } else {
+                showToolMessage("No processed audio available for download. Please perform a trim or fade first.", "error");
+            }
+        });
+
+        initializeWaveSurfer();
+        setControlsEnabled(false);
+        downloadProcessedBtn.disabled = true;
+    </script>
+</body>
+</html>

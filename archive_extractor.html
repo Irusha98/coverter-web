@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive Extractor</title>
+    <meta name="description" content="Easily extract ZIP, RAR, 7Z, and other archive files online with Fixway. No installation needed — free, fast, and secure archive extraction tool.">
+    <meta name="keywords" content="extract ZIP, RAR extractor, unzip files online, 7Z file extractor, archive unzip tool, online extractor, free archive extractor, Fixway tools">
+    <meta name="author" content="Fixway IT Solutions">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Universal box-sizing for consistent layout */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Common styles for body, header, and footer for consistency */
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', sans-serif;
+            color: #000;
+            background: #fff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: auto;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1px 50px; /* Decreased vertical padding from 15px to 10px */
+            background-color: #000;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 0 -20px; /* Adjust if body padding is kept */
+            padding-left: calc(20px + 30px);
+            padding-right: calc(20px + 30px);
+            height: 60px;
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none; /* Ensure it doesn't look like a standard link */
+        }
+        /* SEO heading styles */
+        .seo-heading-container {
+            text-align: center;
+            padding: 10px 10px; /* Further reduced padding */
+            margin-top: 10px; /* Further reduced margin from navbar */
+            margin-bottom: 10px; /* Further reduced margin from main content */
+            max-width: 800px; /* Increased max-width for longer lines */
+            width: 100%;
+            box-sizing: border-box;
+            /* Ensure the container itself is centered */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .seo-heading-container h1 {
+            font-size: 16.5px; /* Even smaller font size for desktop */
+            color: #333;
+            margin: 0;
+            line-height: 1.2; /* Adjusted line height */
+            font-weight: normal; /* Changed to normal (not bold) */
+            text-align: center; /* Ensure text itself is centered within the h1 */
+        }
+
+        @media (max-width: 768px) {
+            .seo-heading-container h1 {
+                font-size: 1.1em; /* Smaller font size for tablets */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .seo-heading-container h1 {
+                font-size: 0.9em; /* Even smaller font size for mobile */
+            }
+        }
+
+        /* New styles for the main topic line */
+        .main-topic-line {
+            text-align: center;
+            margin-top: 30px; /* Space from navbar */
+            margin-bottom: 10px; /* Space before the SEO heading */
+        }
+
+        .main-topic-line h1 {
+            font-size: 2.5em; /* Bigger font size */
+            font-weight: bold;
+            color: #000; /* Black color */
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-topic-line h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-topic-line h1 {
+                font-size: 1.8em;
+            }
+        }
+        .navbar .right-nav-group {
+            display: flex;
+            align-items: center; /* This aligns the items themselves */
+            gap: 15px; /* Slightly reduced gap from 20px to 15px */
+        }
+        .navbar .right-nav-group a {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 12px; /* Slightly reduced horizontal padding from 15px to 12px */
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent text from wrapping */
+            transition: border-color 0.3s ease, transform 0.2s ease;
+
+            /* Ensure internal content is centered for perfect alignment */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box; /* Include padding in element's total width/height */
+        }
+        .navbar .right-nav-group a:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+         .navbar .login-button {
+        background-color: #000000;
+        color: #fff;
+        width: 70px;
+        height: 0px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: border-color 0.3s ease, transform 0.2s ease;
+        padding-bottom: 20px;
+        bottom: 4ch;
+        }
+        .navbar .login-button:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #000;
+            color: #fff;
+            padding: 30px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer .footer-links {
+            margin-top: 15px;
+        }
+        .footer .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .footer .footer-links a:hover {
+            color: #e53935;
+        }
+        .sri-lankan-flag {
+            position: absolute;
+            bottom: 35px;
+            right: 20px;
+            width: 60px;
+            height: 30px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        @media (max-width: 700px) {
+            .navbar { padding: 10px 20px; }
+            .navbar .logo { font-size: 22px; }
+            .footer { padding: 20px 20px; }
+            .navbar .right-nav-group { flex-grow: 1; justify-content: flex-end; }
+        }
+        @media (max-width: 576px) {
+            .navbar { flex-wrap: wrap; justify-content: center; padding: 8px 15px; }
+            .navbar .right-nav-group a, .navbar .login-button { flex-grow: 1; text-align: center; }
+            .footer { padding: 15px 15px; }
+            .footer .footer-links a { display: block; margin: 5px 0; }
+            .sri-lankan-flag { width: 40px; height: 20px; bottom: 5px; right: 5px; }
+        }
+
+        /* Main content and card styling */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 1em;
+            gap: 20px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        /* Styling for the file input and its label (Drag & Drop area) */
+        .file-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+        .file-upload-area.drag-over {
+            border-color: #007bff;
+            background-color: #e6f2ff;
+        }
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+        .file-upload-area label {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .file-upload-area .upload-icon {
+            font-size: 2.5em;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        #file-name-display {
+            font-size: 0.9em;
+            color: #333;
+            margin-top: 5px;
+            word-break: break-all;
+        }
+
+        #extractButton {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: normal;
+            box-shadow: none;
+            margin-top: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #extractButton:hover {
+            background-color: #0056b3;
+        }
+        #extractButton:active {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .back-to-home-btn {
+            background-color: #000; /* Changed to match header color */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 40px auto;
+        }
+        .back-to-home-btn:hover {
+            background-color: #333; /* Slightly lighter black on hover */
+        }
+
+        /* Message display area */
+        #message-display {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        #message-display.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        #message-display.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #message-display.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        #loading-indicator {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Login Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(5px); /* Safari support */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .modal-content h3 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #ddd;
+            color: #333;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            text-decoration: none; /* For anchor tags */
+        }
+
+        .social-btn.google {
+            background-color: #DB4437;
+            color: white;
+            border-color: #DB4437;
+        }
+        .social-btn.google:hover {
+            background-color: #C1352A;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .social-btn.facebook {
+            background-color: #4267B2;
+            color: white;
+            border-color: #4267B2;
+        }
+        .social-btn.facebook:hover {
+            background-color: #365899;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .social-btn i {
+            font-size: 1.2em;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #888;
+            margin: 20px 0;
+        }
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .separator:not(:empty)::before {
+            margin-right: .5em;
+        }
+        .separator:not(:empty)::after {
+            margin-left: .5em;
+        }
+
+        .modal-content input[type="email"],
+        .modal-content input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .modal-content button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        .modal-content button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #loginStatus {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        #loginStatus.error {
+            color: #dc2626;
+        }
+        #loginStatus.success {
+            color: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+            <a href="{{ url_for('ai_page') }}">AI</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+     <!-- New Main Topic Line -->
+    <div class="main-topic-line">
+        <h1>Extract Files</h1>
+    </div>
+
+    <!-- SEO Heading Section -->
+    <div class="seo-heading-container">
+        <h1>Easily extract ZIP, RAR, 7Z, and other archive files online with Fixway. No installation needed — free, fast, and secure archive extraction tool.</h1>
+    </div>
+
+    <main>
+        <div class="card">
+            <h2>Extract Archive</h2>
+            <form id="archiveForm" method="POST" enctype="multipart/form-data" action="/extract-archive" class="w-full flex flex-col items-center">
+                <div id="fileUploadArea" class="file-upload-area">
+                    <input type="file" id="archive_file" name="archive_file" accept="*" required>
+                    <i class="fas fa-file-archive upload-icon"></i> <!-- Archive icon -->
+                    <label for="archive_file">Drag & Drop your Archive here or Click to Upload</label>
+                    <span id="file-name-display">No file chosen</span>
+                </div>
+
+                <button type="submit" id="extractButton">Extract Archive</button>
+            </form>
+        </div>
+
+        <div id="message-display"></div> <!-- Message display area -->
+        <div id="loading-indicator">
+            <div class="spinner"></div>
+            <p>Extracting archive...</p>
+        </div>
+
+        <a href="{{ url_for('home') }}" class="back-to-home-btn">Back to Home</a>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Fixway PDF. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="{{ url_for('contact_page') }}">Contact Us</a>
+        </div>
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+
+    <!-- Login Modal HTML -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3>Login to Fixway</h3>
+
+            <button class="social-btn google" id="googleLoginBtn">
+                <i class="fab fa-google"></i> Continue with Google
+            </button>
+            <button class="social-btn facebook" id="facebookLoginBtn">
+                <i class="fab fa-facebook-f"></i> Continue with Facebook
+            </button>
+
+            <div class="separator">OR</div>
+
+            <input type="email" id="loginEmail" placeholder="Email address">
+            <input type="password" id="loginPassword" placeholder="Password">
+
+            <button type="submit" id="emailLoginBtn">Log In</button>
+            <div id="loginStatus"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script>
+        // Firebase Configuration (REPLACE WITH YOUR ACTUAL CONFIG)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Get modal elements
+        const loginModal = document.getElementById('loginModal');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const loginStatusDiv = document.getElementById('loginStatus');
+
+        // Functions to open and close the modal
+        function openModal() {
+            loginModal.style.display = 'flex'; // Use flex to center
+            loginStatusDiv.textContent = ''; // Clear previous messages
+        }
+
+        function closeModal() {
+            loginModal.style.display = 'none';
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            if (event.target == loginModal) {
+                closeModal();
+            }
+        }
+
+        // Firebase Login Handlers
+        googleLoginBtn.addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                loginStatusDiv.textContent = 'Logged in with Google successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Google login error:", error);
+                loginStatusDiv.textContent = `Google login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        facebookLoginBtn.addEventListener('click', async () => {
+            const provider = new firebase.auth.FacebookAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                loginStatusDiv.textContent = 'Logged in with Facebook successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Facebook login error:", error);
+                loginStatusDiv.textContent = `Facebook login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        emailLoginBtn.addEventListener('click', async () => {
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+
+            if (!email || !password) {
+                loginStatusDiv.textContent = 'Please enter both email and password.';
+                loginStatusDiv.className = 'error';
+                return;
+            }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                loginStatusDiv.textContent = 'Logged in successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Email/Password login error:", error);
+                loginStatusDiv.textContent = `Login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        // Existing script for Archive Extractor below this
+        const archiveFileInput = document.getElementById('archive_file');
+        const archiveForm = document.getElementById('archiveForm');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const messageDisplay = document.getElementById('message-display');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const extractButton = document.getElementById('extractButton');
+
+        // Event Listeners
+        archiveFileInput.addEventListener('change', handleFileSelect);
+        archiveForm.addEventListener('submit', handleSubmit);
+
+        // Drag and Drop Event Listeners
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('drag-over');
+        });
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('drag-over');
+        });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                archiveFileInput.files = files; // Assign dropped files to the input
+                handleFileSelect({ target: archiveFileInput }); // Trigger the change handler
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                fileNameDisplay.textContent = 'No file chosen';
+                extractButton.disabled = true;
+                showMessage('Please select an archive file.', 'error');
+                return;
+            }
+
+            fileNameDisplay.textContent = file.name;
+            extractButton.disabled = false;
+            showMessage(`File selected: ${file.name}`, 'info');
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const file = archiveFileInput.files[0];
+            if (!file) {
+                showMessage('Please select an archive file to extract.', 'error');
+                return;
+            }
+
+            loadingIndicator.style.display = 'flex'; // Show loading indicator
+            extractButton.disabled = true; // Disable button during processing
+            messageDisplay.style.display = 'none'; // Hide previous messages
+
+            const formData = new FormData();
+            formData.append('archive_file', file);
+
+            try {
+                const response = await fetch('/extract-archive', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    // Get the filename from the Content-Disposition header
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    let filename = 'extracted_archive.zip'; // Default filename
+                    if (contentDisposition && contentDisposition.includes('filename=')) {
+                        const filenameMatch = contentDisposition.match(/filename\*?=['"]?(?:UTF-8'')?([^;"\n]+)['"]?/i);
+                        if (filenameMatch && filenameMatch[1]) {
+                            filename = decodeURIComponent(filenameMatch[1]);
+                        }
+                    }
+
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    showMessage('Archive extracted and downloaded successfully!', 'success');
+                    // Clear the file input and display name after successful upload
+                    archiveFileInput.value = ''; // Clear the selected file
+                    fileNameDisplay.textContent = '';
+                } else {
+                    const errorText = await response.text();
+                    showMessage(`Error extracting archive: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                console.error('Network or fetch error:', error);
+                showMessage(`An unexpected error occurred: ${error.message}`, 'error');
+            } finally {
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                extractButton.disabled = false; // Re-enable button
+            }
+        }
+
+        // Function to display messages
+        function showMessage(message, type) {
+            messageDisplay.textContent = message;
+            messageDisplay.className = ''; // Clear existing classes
+            messageDisplay.classList.add('message-display', type);
+            messageDisplay.style.display = 'block'; // Show the message
+            setTimeout(() => {
+                messageDisplay.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initial state on page load
+        extractButton.disabled = true; // Disable until a file is chosen
+        showMessage('Upload an archive file to extract its contents.', 'info');
+    </script>
+</body>
+</html>

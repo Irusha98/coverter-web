@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fixway</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #000;
+    background: #fff;
+    text-align: center;
+    padding: 0 1em;
+  }
+  .navbar {
+    display: flex;
+    justify-content: space-between; /* Pushes logo to left, button group to right */
+    align-items: center;
+    padding: 15px 50px;
+    background-color: #000; /* Black background */
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin: 0 -20px;
+    padding-left: calc(20px + 30px);
+    padding-right: calc(20px + 30px);
+  }
+  /* Styling for the logo within the navbar */
+  .navbar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    /* Add cursor pointer to indicate it's clickable */
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* New container for AI, About Us, and Login buttons */
+  .navbar .right-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Space between AI, About Us, and Login buttons */
+  }
+
+  /* Styling for the new AI and About Us buttons/links */
+  .navbar .right-nav-group a { /* Target links within the new group */
+    background-color: #000;
+    color: #fff;
+    padding: 8px 15px;
+    text-decoration: none;
+    border: 1px solid transparent; /* Transparent border by default */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    /* Only transition border-color and transform */
+    transition: border-color 0.3s ease, transform 0.2s ease;
+  }
+
+  /* Hover effect for the new buttons: white border appears */
+  .navbar .right-nav-group a:hover {
+    border-color: #fff; /* White border on hover */
+    /* Removed background-color change */
+    transform: translateY(-2px); /* Slight lift effect */
+  }
+
+  /* Styling for the login button - MODIFIED to match other buttons */
+  .navbar .login-button {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 20px;
+    border: 1px solid transparent; /* Changed to transparent border by default */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    /* Only transition border-color and transform */
+    transition: border-color 0.3s ease, transform 0.2s ease;
+  }
+  /* Hover effect for the login button - MODIFIED to match other buttons */
+  .navbar .login-button:hover {
+    /* Removed background-color change */
+    border-color: #fff; /* White border on hover */
+    transform: translateY(-2px);
+  }
+
+   .footer {
+      background-color: #000; /* Black background */
+      color: #fff;
+      padding: 30px 50px;
+      text-align: center;
+      position: relative; /* Needed for absolute positioning of the flag */
+      overflow: hidden; /* Hide anything that overflows */
+      margin: 0 -20px 0 -20px;
+  }
+  .footer p {
+      margin: 0;
+      font-size: 14px;
+  }
+  .footer .footer-links {
+      margin-top: 15px;
+  }
+  .footer .footer-links a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 14px;
+      transition: color 0.3s ease;
+  }
+  .footer .footer-links a:hover {
+      color: #e53935;
+  }
+
+  /* Sri Lankan Flag Styling */
+  .sri-lankan-flag {
+      position: absolute;
+      top: auto; /* Corrected: was 'px' */
+      bottom: 35px; /* Adjust as needed for spacing from bottom */
+      right: 20px; /* Adjust as needed for spacing from right */
+      width: 60px; /* Flag width */
+      height: 30px; /* Flag height (approx 2:1 ratio) */
+      border: 1px solid #ccc; /* Small border for definition */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
+      z-index: 10; /* Ensure it's above other footer content if needed */
+  }
+
+
+  /* Animation for hero image*/
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(1000px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* New Outline Draw Effect Keyframes (left to right reveal) */
+  @keyframes outlineDraw {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0% 0 0);
+    }
+  }
+
+  /* Header Styling */
+  .hero {
+    padding-top: 3em;
+    position: relative;
+    overflow: hidden; /* Ensure content outside is hidden */
+  }
+
+  .fixway-title {
+    font-size: 20em;
+    font-weight: 900;
+    margin: 0;
+    position: relative;
+    z-index: 2; /* Ensures title is above the image */
+    display: flex;
+    justify-content: center; /* Center the words */
+    white-space: nowrap; /* Keep words on one line */
+  }
+
+  .fix {
+    display: inline-block;
+  }
+
+  .fix span { /* Styles for individual letters within 'Fix' */
+    color: transparent; /* Initially transparent */
+    -webkit-text-stroke: 2px #000; /* Black outline */
+    text-stroke: 2px #000;
+    display: inline-block; /* Allows individual animation */
+    overflow: hidden; /* Hides parts of the letter before it's "drawn" */
+    white-space: nowrap; /* Ensures letters don't wrap */
+    animation: outlineDraw 0.5s linear forwards; /* Apply outline drawing animation */
+    clip-path: inset(0 100% 0 0); /* Start fully clipped */
+    transition: color 0.8s ease-out; /* Smooth transition for color fill */
+  }
+
+  /* Staggering delays for each letter of 'Fix' will be set by JavaScript */
+
+  .way {
+    color: transparent; /* Remains outlined */
+    -webkit-text-stroke: 2px #000;
+    text-stroke: 2px #000;
+    display: inline-block;
+    overflow: hidden; /* Hides parts of the word before it's "drawn" */
+    white-space: nowrap; /* Ensures word doesn't wrap */
+    animation: outlineDraw 1s linear forwards; /* Apply outline drawing animation */
+    clip-path: inset(0 100% 0 0); /* Start fully clipped */
+  }
+
+  /* FIX for hero-image start */
+  .hero-image {
+    max-width: 500px;
+    width: 1000%;
+    /* Increased negative margin to pull image up even more, making it touch/overlap the about section */
+    margin-top: -450px; /* Adjusted from -270px */
+    margin-bottom: 0; /* Ensure no bottom margin pushes content away */
+    position: relative;
+    z-index: 1; /* Ensures image is above the about section if they overlap */
+    opacity: 0;
+    animation: slideUp 1.5s ease-out forwards;
+    animation-delay: 0.3s;
+    padding-bottom: 0;
+    padding-top: 0px;
+  }
+  /* FIX for hero-image end */
+
+  .buttons {
+    margin-top: 1em;
+  }
+
+  .buttons button {
+    font-size: 1em;
+    padding: 1em 2em;
+    margin: 0.5em;
+    border: 2px solid #000;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .buttons button:last-child {
+    background: #fff;
+    color: #000;
+  }
+
+  .buttons button:hover {
+    background: #333;
+    color: #fff;
+  }
+
+  .about {
+    max-width: 1000px;
+    margin: 0 auto; /* Set margin-top to 0 to remove any default gap */
+    font-size: 1.2em;
+    line-height: 1.6;
+    text-align: justify;
+    padding-top: 0; /* Ensure no padding-top */
+    margin-bottom: 0; /* Ensure no bottom margin pushes content away from intro-section */
+    margin-top: 0px;
+  }
+
+  .about p { /* Target paragraph inside .about to remove default margins */
+    margin-bottom: 100px;
+  }
+
+  .intro-section {
+    max-width: 1000px;
+    margin: 0 auto; /* Set margin-top to 0 to remove any default gap */
+    font-size: 1.2em;
+    line-height: 1.6;
+    text-align: justify;
+    padding-top: 60px; /* Ensure no padding-top */
+    display: flex;
+    align-items: center;
+    gap: 2em;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-bottom: 150px;
+  }
+
+  .intro-text {
+    flex: 1;
+  }
+
+  .intro-text p { /* Target paragraph inside .intro-text to remove default margins */
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-bottom: 20px;
+    top: 1000px;
+  }
+
+  .intro-photo {
+    max-width: 300px;
+    border-radius: 0px; /* Corrected: was 'px' */
+    padding-bottom: 1px;
+    padding-top: 0px; /* Corrected: was 'px' */
+  }
+
+  .banner-image {
+    width: 100%; /* Make it fill its container */
+    height: auto; /* Maintain aspect ratio */
+    display: block;
+    margin: 0; /* Remove specific margins if not needed */
+    padding: 0;
+  }
+
+  @media (max-width: 700px) {
+    .fixway-title {
+      font-size: 6em;
+    }
+    /* Adjusted hero-image margin for smaller screens */
+    .hero-image {
+      margin-top: -0px; /* Less negative margin for smaller screens */
+      height: 330px;
+      width: 275px;
+    }
+    .intro-section {
+      flex-direction: column;
+      text-align: center;
+    }
+    .intro-text {
+      margin-bottom: 1.5em;
+    }
+    .navbar {
+      padding: 15px 20px;
+      margin: 0 -20px;
+    }
+    .navbar .logo {
+      font-size: 22px;
+    }
+    main {
+      max-width: 90%;
+      margin: 20px auto;
+    }
+    .footer {
+      padding: 20px 20px;
+      margin: 0 -20px 0 -20px;
+    }
+    .navbar .right-nav-group {
+      flex-grow: 1; /* Allow the group to take available space */
+      justify-content: flex-end; /* Push the group to the right */
+    }
+    .modal-content {
+      max-width: 350px;
+      padding: 25px;
+    }
+    .modal-content input[type="email"],
+    .social-btn {
+      width: calc(100% - 10px); /* Adjust for smaller padding */
+      padding: 10px 5px;
+    }
+  }
+  @media (max-width: 576px) {
+    .hero-section h1 {
+      font-size: 35px;
+    }
+    .fixway-title { /* Even smaller font size for very small screens */
+        font-size: 4em;
+    }
+    /* Further adjusted hero-image margin for very small screens */
+    .hero-image {
+        margin-top: -30px; /* Even less negative margin */
+    }
+    .navbar {
+      flex-wrap: wrap; /* Allow items to wrap to next line */
+      justify-content: center; /* Center items when wrapped */
+      padding: 10px 15px;
+      margin: 0 -15px;
+    }
+    .navbar .right-nav-group a,
+    .navbar .login-button {
+      flex-grow: 1; /* Allow buttons to grow and fill space */
+      text-align: center; /* Center text within buttons */
+    }
+    .footer {
+      padding: 15px 15px;
+      margin: 0 -15px 0 -15px;
+    }
+    .footer .footer-links a {
+      display: block;
+      margin: 5px 0;
+    }
+    .sri-lankan-flag {
+      width: 40px; /* Even smaller flag on very small screens */
+      height: 20px;
+      bottom: 5px;
+      right: 5px;
+    }
+  }
+
+        /* Login Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(5px); /* Safari support */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .modal-content h3 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #ddd;
+            color: #333;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            text-decoration: none; /* For anchor tags */
+        }
+
+        .social-btn.google {
+            background-color: #DB4437;
+            color: white;
+            border-color: #DB4437;
+        }
+        .social-btn.google:hover {
+            background-color: #C1352A;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .social-btn.facebook {
+            background-color: #4267B2;
+            color: white;
+            border-color: #4267B2;
+        }
+        .social-btn.facebook:hover {
+            background-color: #365899;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .social-btn i {
+            font-size: 1.2em;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #888;
+            margin: 20px 0;
+        }
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .separator:not(:empty)::before {
+            margin-right: .5em;
+        }
+        .separator:not(:empty)::after {
+            margin-left: .5em;
+        }
+
+        .modal-content input[type="email"],
+        .modal-content input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .modal-content button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        .modal-content button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #loginStatus {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        #loginStatus.error {
+            color: #dc2626;
+        }
+        #loginStatus.success {
+            color: #16a34a;
+        }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+            <a href="{{ url_for('ai_page') }}">AI</a>
+            <!-- Updated link to Flask route -->
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+
+<!-- Hero section -->
+<div class="hero">
+  <h1 class="fixway-title">
+    <span class="fix" id="fixWord">
+      <span id="fixF">F</span><span id="fixI">i</span><span id="fixX">x</span>
+    </span><span class="way" id="wayWord">way</span>
+  </h1>
+  <!-- Updated image paths to use url_for('static') -->
+  <img src="{{ url_for('static', filename='irusha.png') }}" alt="Irusha Hero Image" class="hero-image" onerror="this.onerror=null;this.src='https://placehold.co/500x300/cccccc/000000?text=Irusha+Image'"/>
+</div>
+
+<!-- About Fixway -->
+<div class="about">
+  <p>Warmly welcome and appreciate your visit to us. Fixway is an IT company in the fast-developing world. We are dedicated to making technology simpler, faster, and more accessible for everyone. Our mission is to create practical solutions that help people achieve more with less effort. This initiative is led by Irusha Samarasinghe (IT Student), originally from Sri Lanka and now based in New Zealand. We offer a range of online tools designed to streamline your daily tasks and projects. As we grow, Fixway aims to expand its services globally, constantly innovating to deliver higher outcomes while maintaining efficiency and productivity in everything we do.This website fully designed by me every singale functions has made by me design structure also.</p>
+</div>
+
+<!-- Banner Image -->
+<img src="{{ url_for('static', filename='banner.png') }}" alt="Fixway Services Banner" class="banner-image" onerror="this.onerror=null;this.src='https://placehold.co/1000x200/cccccc/000000?text=Banner+Image'"/>
+
+<!-- Personal Introduction -->
+<div class="intro-section">
+  <div class="intro-text">
+    <p>
+      This venture represents more than just a website — it is the foundation of a dream. I believe Fixway has the potential to grow into something remarkable, and this is only the beginning. Every great journey starts with a single step, and today marks mine.I created this platform not only to support my education but also to inspire and help others along the way. I hope every visitor finds value, productivity, and encouragement through what Fixway offers.It brings me immense pleasure to welcome you here. Your support means a great deal, and I sincerely wish you all success in your own journeys.<br><br>
+      With ambition and gratitude,<br>
+      <strong>Irusha Samarasinghe</strong><br>
+      <strong><em>Founder – Fixway</em></strong>
+    </p>
+  </div>
+  <!-- Updated image path to use url_for('static') -->
+  <img src="{{ url_for('static', filename='pc.jpg') }}" alt="Irusha Hero Image" class="intro-photo" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/000000?text=PC+Image'"/>
+</div>
+ <footer class="footer">
+        <p>&copy; 2025 Fixway PDF. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+           <a href="{{ url_for('contact_page') }}">Contact Us</a></a>
+        </div>
+        <!-- Updated image path to use url_for('static') -->
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+
+<!-- Login Modal HTML (copied from index.html) -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h3>Login to Fixway</h3>
+
+        <button class="social-btn google" id="googleLoginBtn">
+            <i class="fab fa-google"></i> Continue with Google
+        </button>
+        <button class="social-btn facebook" id="facebookLoginBtn">
+            <i class="fab fa-facebook-f"></i> Continue with Facebook
+        </button>
+
+        <div class="separator">OR</div>
+
+        <input type="email" id="loginEmail" placeholder="Email address">
+        <input type="password" id="loginPassword" placeholder="Password">
+
+        <button type="submit" id="emailLoginBtn">Log In</button>
+        <div id="loginStatus"></div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const fixF = document.getElementById('fixF');
+    const fixI = document.getElementById('fixI');
+    const fixX = document.getElementById('fixX');
+    const wayWord = document.getElementById('wayWord');
+
+    const outlineDrawDuration = 500; // Duration for outline drawing of each letter
+    const outlineDrawDelayBetweenLetters = 100; // Delay between each letter's outline drawing
+    const fillDelayAfterOutline = 200; // Delay after outline is drawn before fill starts
+
+    // Animate "Fix" letters sequentially
+    const fixLetters = [fixF, fixI, fixX];
+    fixLetters.forEach((letter, index) => {
+      const initialDelay = 500 + (index * outlineDrawDelayBetweenLetters); // Start after hero image animates
+
+      // Apply outline draw animation
+      letter.style.animationDelay = `${initialDelay}ms`;
+
+      // After outline animation, trigger fill
+      letter.addEventListener('animationend', function handler(event) {
+        if (event.animationName === 'outlineDraw') {
+          setTimeout(() => {
+            letter.style.color = 'black'; // Fill with black
+          }, fillDelayAfterOutline);
+          letter.removeEventListener('animationend', handler);
+        }
+      }, { once: true });
+    });
+
+    // Calculate when "Way" outline should start
+    // (Initial delay of first 'fix' letter) + (all 'fix' letter outline draws) + (all 'fix' letter fill delays) + (buffer)
+    const totalFixAnimationTime = outlineDrawDuration + (fixLetters.length - 1) * outlineDrawDelayBetweenLetters + fillDelayAfterOutline + 800; // 800ms buffer
+
+    wayWord.style.animation = `outlineDraw 1s linear forwards`;
+    wayWord.style.animationDelay = `${totalFixAnimationTime}ms`;
+    wayWord.style.clipPath = `inset(0 100% 0 0)`; // Ensure it starts clipped
+  });
+
+  // --- Login Modal Functions (copied from index.html) ---
+  const loginModal = document.getElementById("loginModal");
+  const googleLoginBtn = document.getElementById('googleLoginBtn');
+  const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+  const emailLoginBtn = document.getElementById('emailLoginBtn');
+  const loginEmailInput = document.getElementById('loginEmail');
+  const loginPasswordInput = document.getElementById('loginPassword');
+  const loginStatusDiv = document.getElementById('loginStatus');
+
+  // Firebase Configuration (REPLACE WITH YOUR ACTUAL CONFIG)
+  const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  window.openModal = function() {
+      loginModal.style.display = "flex"; /* Use flex to center the modal content */
+      loginStatusDiv.textContent = ''; // Clear previous messages
+  }
+
+  window.closeModal = function() {
+      loginModal.style.display = "none";
+  }
+
+  // Close login modal when clicking outside the content
+  loginModal.addEventListener('click', function(event) {
+      if (event.target === loginModal) {
+          closeModal();
+      }
+  });
+
+  // Firebase Login Handlers
+  googleLoginBtn.addEventListener('click', async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+          await auth.signInWithPopup(provider);
+          loginStatusDiv.textContent = 'Logged in with Google successfully!';
+          loginStatusDiv.className = 'success';
+          setTimeout(closeModal, 1500);
+      }
+      catch (error) {
+          console.error("Google login error:", error);
+          loginStatusDiv.textContent = `Google login failed: ${error.message}`;
+          loginStatusDiv.className = 'error';
+      }
+  });
+
+  facebookLoginBtn.addEventListener('click', async () => {
+      const provider = new firebase.auth.FacebookAuthProvider();
+      try {
+          await auth.signInWithPopup(provider);
+          loginStatusDiv.textContent = 'Logged in with Facebook successfully!';
+          loginStatusDiv.className = 'success';
+          setTimeout(closeModal, 1500);
+      }
+      catch (error) {
+          console.error("Facebook login error:", error);
+          loginStatusDiv.textContent = `Facebook login failed: ${error.message}`;
+          loginStatusDiv.className = 'error';
+      }
+  });
+
+  emailLoginBtn.addEventListener('click', async () => {
+      const email = loginEmailInput.value;
+      const password = loginPasswordInput.value;
+
+      if (!email || !password) {
+          loginStatusDiv.textContent = 'Please enter both email and password.';
+          loginStatusDiv.className = 'error';
+          return;
+      }
+
+      try {
+          await auth.signInWithEmailAndPassword(email, password);
+          loginStatusDiv.textContent = 'Logged in successfully!';
+          loginStatusDiv.className = 'success';
+          setTimeout(closeModal, 1500);
+      }
+      catch (error) {
+          console.error("Email/Password login error:", error);
+          loginStatusDiv.textContent = `Login failed: ${error.message}`;
+          loginStatusDiv.className = 'error';
+      }
+  });
+</script>
+
+</body>
+</html>

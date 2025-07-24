@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools - Fixway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Common styles from other pages for consistency */
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', sans-serif;
+            color: #000;
+            background: #fff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: auto;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 50px;
+            background-color: #000;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            /* Add cursor pointer to indicate it's clickable */
+            cursor: pointer;
+            text-decoration: none;
+
+        }
+        .navbar .right-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .navbar .right-nav-group a {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 12px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+        .navbar .right-nav-group a:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .navbar .login-button {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+        .navbar .login-button:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #000;
+            color: #fff;
+            padding: 30px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer .footer-links {
+            margin-top: 15px;
+        }
+        .footer .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .footer .footer-links a:hover {
+            color: #e53935;
+        }
+        .sri-lankan-flag {
+            position: absolute;
+            bottom: 35px;
+            right: 20px;
+            width: 60px;
+            height: 30px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        @media (max-width: 700px) {
+            .navbar { padding: 10px 20px; }
+            .navbar .logo { font-size: 22px; }
+            .footer { padding: 20px 20px; }
+            .navbar .right-nav-group { flex-grow: 1; justify-content: flex-end; }
+        }
+        @media (max-width: 576px) {
+            .navbar { flex-wrap: wrap; justify-content: center; padding: 8px 15px; }
+            .navbar .right-nav-group a, .navbar .login-button { flex-grow: 1; text-align: center; }
+            .footer { padding: 15px 15px; }
+            .footer .footer-links a { display: block; margin: 5px 0; }
+            .sri-lankan-flag { width: 40px; height: 20px; bottom: 5px; right: 5px; }
+        }
+
+        /* Page specific styles */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 1em;
+            gap: 20px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #333;
+        }
+        .card p {
+            font-size: 1.1em;
+            color: #555;
+            line-height: 1.6;
+        }
+        .back-to-home-btn {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 40px auto;
+        }
+        .back-to-home-btn:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+            <a href="{{ url_for('ai_page') }}">AI</a> <!-- Updated link -->
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Our AI Features</h2>
+            <p>Welcome to the AI section of Fixway! We are currently developing cutting-edge artificial intelligence tools to enhance your document and media processing experience.</p>
+            <p>Stay tuned for exciting updates on features like intelligent document analysis, automated content generation, advanced image recognition, and more!</p>
+            <p>Our goal is to integrate smart AI solutions that simplify complex tasks and boost your productivity.</p>
+        </div>
+        <a href="{{ url_for('home') }}" class="back-to-home-btn">Back to Home</a>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Fixway PDF. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="{{ url_for('contact_page') }}">Contact Us</a>
+        </div>
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+</body>
+</html>

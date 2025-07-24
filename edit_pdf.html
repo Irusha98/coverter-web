@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit PDF - {{ filename }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Version: 2025-07-01_V39_FRONTEND_RAW_PIXEL_SEND */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background-color: #111; /* Original dark background */
+            color: white;
+            padding: 20px;
+            width: 280px; /* Wider sidebar for more controls */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            z-index: 100; /* Ensure it's above content but below modals */
+        }
+
+        /* General button styling in sidebar and modals */
+        .sidebar button,
+        .style-controls button {
+            background: #444;
+            border: none;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            border-radius: 50px; /* More rounded */
+            text-align: center; /* Center text in all buttons */
+            transition: background 0.3s ease, transform 0.1s ease;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: 500;
+        }
+        .sidebar button:hover,
+        .style-controls button:hover {
+            background: #666;
+            transform: translateY(-1px);
+        }
+
+        /* Specific action buttons in sidebar */
+        .sidebar button.action-btn {
+            background-color: #2563eb;
+        }
+        .sidebar button.action-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Style control active state */
+        .style-controls button.active {
+            background-color: #007bff; /* Highlight active style */
+        }
+        .style-controls button.active:hover {
+            background-color: #0056b3;
+        }
+        /* Style for containers that are only visible when an element is selected */
+        .selection-dependent-control { /* New class for controls that depend on selection */
+            display: none; /* Hidden by default */
+            flex-direction: column; /* Ensure it lays out vertically if it's a div */
+            gap: 10px;
+            align-items: flex-start;
+            background-color: #222; /* Consistent with style-controls */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .selection-dependent-control.active-selection {
+            display: flex; /* Shown when activeElement is set */
+        }
+        .selection-dependent-control label {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
+        }
+        .selection-dependent-control input[type="range"],
+        .selection-dependent-control input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            margin-top: -5px; /* Adjust thumb vertical position */
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+
+
+        .topbar {
+            background-color: #000;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .editor-container {
+            flex-grow: 1;
+            background-color: #f0f0f0; /* Original background color */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #pdf-viewer {
+            flex-grow: 1;
+            overflow: auto; /* This allows scrolling if content exceeds height */
+            background-color: white;
+            position: relative;
+            /* Explicitly set A4 width for consistent display */
+            width: 595pt; /* A4 width in points (approx 794px at 96 DPI) */
+            margin: 0 auto; /* Center the viewer */
+            box-shadow: 0 0 10px rgba(0,0,0,0.2); /* Add shadow for better separation */
+        }
+
+        #pdf-canvas {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%; /* Will now adhere to 595pt width of parent */
+            height: auto;
+        }
+
+        /* Elements added to canvas (text, signatures) */
+        .editable-element {
+            position: absolute;
+            cursor: grab;
+            padding: 5px; /* Important for larger grab area around content */
+            border: 1px dashed transparent;
+            user-select: none;
+            touch-action: none;
+            z-index: 10;
+            box-sizing: border-box; /* Crucial: padding/border are included in width/height */
+            width: auto;
+            height: auto;
+            transition: width 0.1s ease, height 0.1s ease, left 0.1s ease, top 0.1s ease; /* Smooth transitions for drag/select */
+        }
+        .editable-element:hover, .editable-element.dragging, .editable-element.selected { /* Added .selected state */
+            border: 1px dashed #007bff;
+        }
+        /* Disable transitions when actively being dragged or resized for smoothness */
+        .editable-element.dragging,
+        .editable-element.resizing { /* Added .resizing class */
+            transition: none !important;
+        }
+
+
+        .editable-element input {
+            background: transparent;
+            border: none; /* Make this none as the parent div has the border */
+            color: inherit; /* Inherit color from parent div */
+            font-size: inherit; /* Inherit font size from parent div */
+            font-family: inherit; /* Inherit font family from parent div */
+            font-weight: inherit; /* Inherit font weight */
+            font-style: inherit; /* Inherit font style */
+            width: 100%; /* Fill the parent div's content box */
+            height: 100%; /* Fill the parent div's content box */
+            padding: 0; /* No padding on input itself */
+            margin: 0;
+            outline: none;
+            box-sizing: border-box;
+            pointer-events: auto; /* IMPORTANT: Allow direct interaction with the input field */
+        }
+
+        .editable-element img, .editable-element svg {
+            width: 100%; /* Make image/svg fill its parent div's content area */
+            height: 100%; /* Make image/svg fill its parent div's content area */
+            object-fit: contain; /* Ensure image/svg scales down while maintaining aspect ratio */
+            display: block;
+            pointer-events: none; /* Disable pointer events on image/svg to allow interaction with overlay UI */
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 11;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .remove-btn:hover {
+            background-color: #dc2626;
+            transform: scale(1.1);
+        }
+
+
+        /* Modal styles */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* General modal-buttons styling (for OK/Cancel at bottom of modals) */
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .modal-buttons button { /* Specific to general modal buttons */
+            background-color: #444; /* Default for non-specific modal buttons */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px; /* Less rounded for consistency in modals */
+            transition: background-color 0.3s ease;
+            flex: 1;
+            max-width: 150px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .modal-buttons button:hover {
+            background-color: #666;
+        }
+        /* Specific Cancel button in general modals */
+        .modal-buttons button.cancel {
+            background-color: #EF4444; /* Red as requested */
+        }
+        button.cancel:hover {
+            background-color: #DC2626; /* Darker red */
+        }
+
+
+        /* Signature drawing canvas specific styles */
+        #signatureDrawingCanvas {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: crosshair;
+            margin-top: 15px;
+            width: 100%;
+            height: 200px; /* Increased height */
+            max-width: 450px;
+            touch-action: none;
+            border-radius: 5px; /* Consistent rounded corners */
+            box-sizing: border-box; /* Ensure border doesn't add to width/height */
+        }
+
+        /* Style controls section */
+        .style-controls {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .style-controls label {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
+        }
+        .style-controls select,
+        .style-controls input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        .style-controls select option {
+            background-color: #333;
+            color: white;
+        }
+        /* Color palette specific styles */
+        .color-palette-section {
+            width: 100%;
+        }
+        .color-palette-section h4 {
+            color: #ccc;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .color-palette-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .color-palette-grid.standard {
+            grid-template-columns: repeat(auto-fit, minmax(25px, 1fr));
+            gap: 5px;
+        }
+        .color-square {
+            width: 25px;
+            height: 25px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease, transform 0.1s ease;
+        }
+        .color-square:hover {
+            transform: scale(1.1);
+        }
+        .color-square.active {
+            border-color: #007bff;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+        }
+
+        .style-controls .font-style-buttons {
+            display: flex;
+            gap: 5px;
+            width: 100%;
+        }
+        .style-controls .font-style-buttons button {
+            flex: 1;
+            border-radius: 5px;
+            box-shadow: none;
+        }
+        .style-controls .font-style-buttons button:hover {
+            transform: none;
+        }
+
+        /* Signature Modal Button Specifics */
+        .signature-modal-controls-group {
+            display: flex;
+            flex-direction: row; /* Changed to row for horizontal layout */
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: space-between; /* Space out buttons */
+            width: 100%; /* Ensure it takes full width */
+        }
+        /* Base style for buttons within this group */
+        .signature-modal-controls-group button {
+            background-color: #000; /* Default black */
+            color: white;
+            border-radius: 8px; /* Consistent roundedness */
+            padding: 10px 15px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            flex: 1; /* Allow buttons to grow and share space */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .signature-modal-controls-group button:hover {
+            background-color: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Specific overrides for signature modal buttons */
+        button.signature-upload-image-btn {
+            background-color: #EF4444; /* Red */
+        }
+        button.signature-upload-image-btn:hover {
+            background-color: #DC2626; /* Darker red */
+        }
+
+        button.signature-clear-drawing-btn,
+        button.signature-add-drawing-btn {
+            background-color: #000; /* Black */
+        }
+        button.signature-clear-drawing-btn:hover,
+        button.signature-add-drawing-btn:hover {
+            background-color: #333;
+        }
+
+
+        .signature-draw-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            max-width: 100%;
+        }
+        .signature-draw-color-square {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s ease, transform 0.1s ease;
+        }
+        .signature-draw-color-square.active {
+            border-color: #007bff;
+            transform: scale(1.1);
+        }
+
+        /* No direct resizing handles/outlines in CSS anymore */
+        /* All resizing UI is generated via JS in renderSignatureSizeControls */
+
+        /* NEW COLOR PICKER UI STYLES */
+        .color-picker-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .current-color-display {
+            width: 40px;
+            height: 30px;
+            border: 2px solid #555;
+            border-radius: 50px; /* More rounded */
+            background-color: black; /* Default */
+            cursor: pointer;
+            transition: border-color 0.2s ease, transform 0.1s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+        .current-color-display:hover {
+            transform: scale(1.05);
+            border-color: #007bff;
+        }
+
+        .more-colors-btn {
+            flex-grow: 1; /* Take remaining space */
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            box-shadow: none; /* Override default button shadow */
+        }
+        .more-colors-btn:hover {
+            background-color: #555;
+            transform: none; /* Override default button transform */
+        }
+
+        /* Color Picker Modal */
+        #colorPickerModalContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2500; /* Higher z-index than other modals */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #colorPickerModalContainer.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #colorPickerModalContent {
+            background-color: #222; /* Dark background consistent with sidebar */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 350px; /* Adjust width as needed */
+            width: 90%;
+            color: white;
+        }
+        #colorPickerModalContent h4 {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            text-align: left;
+            font-weight: 600;
+        }
+        /* Ensure color squares within modal inherit styles */
+        #colorPickerModalContent .color-palette-grid {
+            margin-bottom: 15px;
+        }
+        #colorPickerModalContent .color-square {
+            width: 30px; /* Slightly larger in modal */
+            height: 30px;
+            border-radius: 5px; /* Keep consistent with palette in sidebar */
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <button onclick="addTextBox()" class="action-btn">➕ Add Text Box</button>
+        <button onclick="addDateBox()" class="action-btn">🗓️ Add Date</button>
+        <button onclick="openSignatureModal()" class="action-btn">✍️ Add Signature</button>
+        <button onclick="addCheckmark()" class="action-btn">✔️ Add Checkmark</button>
+        <button onclick="addCross()" class="action-btn">❌ Add Cross</button>
+
+        <div class="border-t border-gray-700 my-4"></div>
+
+        <div class="style-controls">
+            <label for="fontFamily">Font Family:</label>
+            <select id="fontFamily" onchange="applyStyle('fontFamily', this.value)">
+                <option value="Inter, sans-serif">Inter</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="Verdana, sans-serif">Verdana</option>
+                <option value="Times New Roman, serif">Times New Roman</option>
+                <option value="Courier New, monospace">Courier New</option>
+                <option value="Georgia, serif">Georgia</option>
+            </select>
+
+            <label for="fontSize">Font Size (px):</label>
+            <input type="number" id="fontSize" value="16" min="8" max="72" onchange="applyStyle('fontSize', this.value + 'px')">
+
+            <label>Text Color:</label>
+            <div class="color-picker-control">
+                <span id="currentColorDisplay" class="current-color-display" title="Current Text Color"></span>
+                <button class="more-colors-btn" onclick="openColorPickerModal()">More Colors</button>
+            </div>
+
+            <div class="font-style-buttons">
+                <button id="boldBtn" onclick="toggleStyle('fontWeight', 'bold')" title="Bold"><b>B</b></button>
+                <button id="italicBtn" onclick="toggleStyle('fontStyle', 'italic')" title="Italic"><i>I</i></button>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-700 my-4"></div>
+
+        <div id="signatureSizeControls" class="selection-dependent-control">
+            <label for="signatureWidthSlider">Signature/Mark Size:</label>
+            <input type="range" id="signatureWidthSlider" min="20" max="400" value="150" oninput="updateSignatureSize(this.value, 'slider')">
+            <input type="number" id="signatureWidthNumber" min="20" max="400" value="150" onchange="updateSignatureSize(this.value, 'number')">
+            <span style="color: #aaa; font-size: 0.8rem;">(px width)</span>
+        </div>
+
+
+        <button onclick="goBack()">⬅️ Back</button>
+        <button onclick="goHome()">🏠 Home</button>
+    </div>
+    <div class="editor-container">
+        <div class="topbar">
+            <span class="text-lg font-semibold">Editing: {{ filename }}</span>
+            <div class="page-navigation flex items-center gap-2">
+                <button onclick="changePage(-1)" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-2 rounded-md transition duration-300 ease-in-out shadow-md">⬅️ Prev</button>
+                <span id="page-num" class="text-white font-semibold">1</span> / <span id="page-count" class="text-white">?</span>
+                <button onclick="changePage(1)" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-2 rounded-md transition duration-300 ease-in-out shadow-md">Next ➡️</button>
+            </div>
+            <button onclick="savePdfWithChanges()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded-md transition duration-300 ease-in-out shadow-md">💾 Save</button>
+        </div>
+        <div id="pdf-viewer">
+            <canvas id="pdf-canvas"></canvas>
+            </div>
+    </div>
+
+    <div id="messageBoxContainer" class="modal-container">
+        <div class="modal-content">
+            <p id="messageBoxText"></p>
+            <div class="modal-buttons">
+                <button onclick="hideMessageBox()" class="bg-green-500 hover:bg-green-600 text-white">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="colorPickerModalContainer" class="modal-container">
+        <div id="colorPickerModalContent">
+            <h4>Theme Colors</h4>
+            <div class="color-palette-grid" id="themeColorPalette">
+                </div>
+            <h4>Standard Colors</h4>
+            <div class="color-palette-grid standard" id="standardColorPalette">
+                </div>
+            <div class="modal-buttons">
+                <button onclick="closeColorPickerModal()" class="cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="signatureModalContainer" class="modal-container">
+        <div class="modal-content">
+            <h3>Add Signature</h3>
+            <p>Choose an option to add your signature:</p>
+
+            <div class="flex flex-col gap-4 my-4">
+                <div>
+                    <label for="signatureImageUpload" class="block text-gray-700 text-sm font-semibold mb-2">Upload Image:</label>
+                    <input type="file" id="signatureImageUpload" accept="image/*" class="block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-blue-50 file:text-blue-700
+                        hover:file:bg-blue-100">
+                    <div class="signature-modal-controls-group">
+                        <button onclick="addSignatureFromImage()" class="signature-upload-image-btn">Add Uploaded Image</button>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 my-4 pt-4">
+                    <p class="text-gray-700 text-sm font-semibold mb-2">Or Draw Your Signature:</p>
+                    <div class="signature-draw-palette" id="signatureDrawColorPalette">
+                        </div>
+                    <canvas id="signatureDrawingCanvas" width="400" height="200"></canvas> <div class="signature-modal-controls-group">
+                        <button onclick="clearSignatureDrawing()" class="signature-clear-drawing-btn">Clear Drawing</button>
+                        <button onclick="addSignatureFromDrawing()" class="signature-add-drawing-btn">Add Drawn Signature</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button onclick="closeSignatureModal()" class="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js"></script>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        const pdfSourceUrl = "{{ url_for('uploaded_file', filename=filename) }}";
+        const originalFilename = "{{ filename }}"; // Pass filename from Flask to JS
+
+        let pdfDoc = null;
+        let pageNum = 1; // Current page being displayed
+        let pdfPageCount = 0; // Total pages in the PDF
+        let currentPageDimensions = { width: 0, height: 0 }; // Store original PDF page dimensions in points
+        const canvas = document.getElementById('pdf-canvas');
+        const ctx = canvas.getContext('2d');
+        let currentObjectUrl = null;
+
+        // --- Interactive Element Management ---
+        const pdfViewer = document.getElementById('pdf-viewer');
+        let elements = []; // Array to store added textboxes and signatures
+        let activeElement = null; // Currently selected element (data object from 'elements' array)
+        let isDragging = false; // For general element dragging (textboxes and signatures)
+        let offsetX, offsetY; // Offset from element's top-left corner to mouse/touch
+
+        // --- Constants for CSS box model adjustment ---
+        // These values MUST match the 'padding' and 'border' CSS properties of .editable-element
+        const ELEMENT_CONTENT_PADDING = 5; // Matches 'padding: 5px;'
+        const ELEMENT_BORDER_WIDTH = 1;    // Matches 'border: 1px dashed transparent;'
+        const TOTAL_ELEMENT_FRAME_SIZE = (ELEMENT_CONTENT_PADDING + ELEMENT_BORDER_WIDTH) * 2; // Total pixels added by padding+border (left+right and top+bottom)
+
+        // --- Small empirical offsets for PDF rendering alignment ---
+        // These values compensate for minor differences between browser rendering and PDF rendering.
+        // Adjust these values based on observed shifts in downloaded PDF.
+        // Positive values shift elements further down/right in the FINAL PDF. Negative shift up/left.
+        // Based on console log, y_pdf is significantly too high (element drawn too far down). Increasing this negative value moves it up more.
+        const PDF_RENDER_ADJUSTMENT_X = -2.5; // Shift content left by 2.5px in final PDF (increased from -1.5)
+        const PDF_RENDER_ADJUSTMENT_Y = -6.0; // Shift content up by 6.0px in final PDF (increased from -4.0)
+
+
+        // --- Current Text Styling State ---
+        let currentTextStyle = {
+            fontFamily: 'Inter', // Default to 'Inter' for consistency
+            fontSize: '16px',
+            color: '#000000', // Default black
+            fontWeight: 'normal',
+            fontStyle: 'normal'
+        };
+
+        // --- Signature Drawing Variables ---
+        const signatureDrawingCanvas = document.getElementById('signatureDrawingCanvas');
+        const sigCtx = signatureDrawingCanvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let signatureDrawColor = '#0000FF'; // Default blue for signature drawing
+
+
+        // --- UI Control Elements ---
+        const fontFamilySelect = document.getElementById('fontFamily');
+        const fontSizeInput = document.getElementById('fontSize');
+        const boldBtn = document.getElementById('boldBtn');
+        const italicBtn = document.getElementById('italicBtn');
+        const signatureDrawColorPalette = document.getElementById('signatureDrawColorPalette');
+        const signatureSizeControlsDiv = document.getElementById('signatureSizeControls');
+        const signatureWidthSlider = document.getElementById('signatureWidthSlider');
+        const signatureWidthNumber = document.getElementById('signatureWidthNumber');
+
+        // New UI Elements
+        const currentColorDisplay = document.getElementById('currentColorDisplay');
+        const colorPickerModalContainer = document.getElementById('colorPickerModalContainer');
+        const themeColorPaletteInModal = document.getElementById('themeColorPalette'); // Get reference inside modal
+        const standardColorPaletteInModal = document.getElementById('standardColorPalette'); // Get reference inside modal
+        const pageNumSpan = document.getElementById('page-num');
+        const pageCountSpan = document.getElementById('page-count');
+
+
+        // Define a palette of colors based on your image reference
+        const themeColors = [
+            ['#FFFFFF', '#000000', '#1F4E79', '#4472C4', '#ED7D31', '#A5A5A5', '#FFC000', '#5B9BD5', '#70AD47', '#264478'],
+            ['#F2F2F2', '#7F7F7F', '#C6D9F1', '#BFBFBF', '#B4C6E7', '#A6A6A6', '#8EA9D1', '#8C8C8C', '#698BBD', '#737373'],
+            ['#D9D9D9', '#595959', '#9CC1E7', '#87A2DE', '#F8C8A8', '#7F7F7F', '#FFE699', '#B4C6E7', '#C6E0B4', '#5B9BD5'],
+            ['#BFBFBF', '#404040', '#73A9DE', '#6081D1', '#F5AB7C', '#666666', '#FFDB66', '#8EA9D1', '#A8D68D', '#4472C4'],
+            ['#A6A6A6', '#262626', '#4A90D5', '#3A60C4', '#F18E50', '#4D4D4D', '#FFD033', '#698BBD', '#8BC266', '#264478'],
+            ['#8C8C8C', '#000000', '#2563EB', '#153FB6', '#ED7D31', '#333333', '#FFC000', '#4472C4', '#70AD47', '#1D4ED8']
+        ];
+        const standardColors = ['#C00000', '#FF0000', '#FFC000', '#FFFF00', '#92D050', '#00B050', '#00B0F0', '#0070C0', '#002060', '#7030A0'];
+
+
+        // --- Initialize Color Palettes ---
+        function initializeColorPalette() {
+            // Populate the color picker modal palettes
+            themeColorPaletteInModal.innerHTML = '';
+            standardColorPaletteInModal.innerHTML = '';
+
+            themeColors.forEach(row => {
+                row.forEach(color => {
+                    const square = document.createElement('span');
+                    square.className = 'color-square';
+                    square.style.backgroundColor = color;
+                    square.dataset.color = color;
+                    square.onclick = () => applyStyle('color', color);
+                    themeColorPaletteInModal.appendChild(square);
+                });
+            });
+
+            standardColors.forEach(color => {
+                const square = document.createElement('span');
+                    square.className = 'color-square';
+                    square.style.backgroundColor = color;
+                    square.dataset.color = color;
+                    square.onclick = () => applyStyle('color', color);
+                    standardColorPaletteInModal.appendChild(square);
+            });
+
+            // Signature Draw Color Palette
+            signatureDrawColorPalette.innerHTML = '';
+            standardColors.forEach(color => {
+                const square = document.createElement('span');
+                square.className = 'signature-draw-color-square';
+                square.style.backgroundColor = color;
+                square.dataset.color = color;
+                square.onclick = () => applySignatureColor(color);
+                signatureDrawColorPalette.appendChild(square);
+            });
+
+
+            // Set initial active states for all color related displays
+            updateCurrentColorDisplay(currentTextStyle.color); // Update the single color display
+            updateActiveColorSquareInModal(currentTextStyle.color); // Update the active square in the modal
+            updateActiveSignatureDrawColorSquare(signatureDrawColor);
+        }
+
+        // Updates the single color display square
+        function updateCurrentColorDisplay(color) {
+            currentColorDisplay.style.backgroundColor = color;
+        }
+
+        // Updates the active square in the color picker modal (full palette)
+        function updateActiveColorSquareInModal(activeColor) {
+            // Ensure only squares within the modal are affected
+            document.querySelectorAll('#colorPickerModalContent .color-square').forEach(square => {
+                if (square.dataset.color.toLowerCase() === activeColor.toLowerCase()) {
+                    square.classList.add('active');
+                } else {
+                    square.classList.remove('active');
+                }
+            });
+        }
+
+        // Existing function for signature draw color
+        function updateActiveSignatureDrawColorSquare(activeColor) {
+            document.querySelectorAll('.signature-draw-color-square').forEach(square => {
+                if (square.dataset.color.toLowerCase() === activeColor.toLowerCase()) {
+                    square.classList.add('active');
+                } else {
+                    square.classList.remove('active');
+                }
+            });
+        }
+
+
+        // --- Style Application Functions (Text) ---
+        function applyStyle(property, value) {
+            // Update global currentTextStyle
+            currentTextStyle[property] = value;
+
+            // Apply to currently active textbox/datebox if one exists
+            if (activeElement && (activeElement.type === 'textbox' || activeElement.type === 'datebox')) {
+                const inputElement = activeElement.element.querySelector('input');
+                if (inputElement) {
+                    inputElement.style[property] = value;
+                    // Also update the stored style object for the element
+                    activeElement.style[property] = value;
+                    // Recalculate and update the textbox dimensions in elementData based on new style
+                    updateTextBoxDimensions(activeElement);
+                }
+            }
+
+            // Update UI controls based on the applied style
+            if (property === 'fontWeight') {
+                if (value === 'bold') boldBtn.classList.add('active');
+                else boldBtn.classList.remove('active');
+            } else if (property === 'fontStyle') {
+                if (value === 'italic') italicBtn.classList.add('active');
+                else italicBtn.classList.remove('active');
+            } else if (property === 'color') {
+                updateCurrentColorDisplay(value); // Update the main display
+                updateActiveColorSquareInModal(value); // Update in the modal
+                closeColorPickerModal(); // Close modal after selection
+            } else if (property === 'fontFamily') {
+                    // Update the select box
+                    fontFamilySelect.value = value;
+            } else if (property === 'fontSize') {
+                fontSizeInput.value = parseInt(value);
+            }
+        }
+
+        function toggleStyle(property, value) {
+            const oldValue = currentTextStyle[property];
+            let newValue = (oldValue === value || oldValue === (property === 'fontWeight' ? 'bold' : 'italic')) ? 'normal' : value;
+            if (property === 'fontWeight' && oldValue === 'bolder') newValue = 'normal';
+
+            applyStyle(property, newValue);
+        }
+
+        // Helper function to update textbox/datebox dimensions after content/style changes
+        function updateTextBoxDimensions(elData) {
+            if (elData.element && (elData.type === 'textbox' || elData.type === 'datebox')) {
+                const inputElement = elData.element.querySelector('input');
+                if (inputElement) {
+                    // Temporarily apply current styles to a hidden div to measure accurate text width
+                    const tempDiv = document.createElement('div');
+                    Object.assign(tempDiv.style, elData.style);
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.visibility = 'hidden';
+                    tempDiv.style.whiteSpace = 'nowrap'; // Essential for single line textboxes
+                    tempDiv.textContent = elData.content;
+                    document.body.appendChild(tempDiv);
+
+                    // Calculate content dimensions
+                    const contentWidth = tempDiv.offsetWidth;
+                    const contentHeight = tempDiv.offsetHeight;
+                    document.body.removeChild(tempDiv);
+
+                    // Store the full CSS size of the outer div (including padding/border)
+                    elData.width_css = contentWidth + TOTAL_ELEMENT_FRAME_SIZE;
+                    elData.height_css = contentHeight + TOTAL_ELEMENT_FRAME_SIZE;
+
+                    // Apply the new dimensions to the actual DOM element
+                    elData.element.style.width = `${elData.width_css}px`;
+                    elData.element.style.height = `${elData.height_css}px`;
+
+                    // Update PDF dimensions based on new *content* CSS dimensions
+                    const canvasRect = canvas.getBoundingClientRect();
+                    // Validate canvas dimensions before calculating scales
+                    if (canvas.width === 0 || canvasRect.width === 0 || canvas.height === 0 || canvasRect.height === 0) {
+                        console.warn("updateTextBoxDimensions: Canvas dimensions are zero, skipping PDF dimension update.");
+                        return; // Prevent division by zero
+                    }
+                    const scaleX_px_to_pt = canvas.width / canvasRect.width;
+                    const scaleY_px_to_pt = canvas.height / canvasRect.height;
+                    elData.width_pdf = contentWidth * scaleX_px_to_pt;
+                    elData.height_pdf = contentHeight * scaleY_px_to_pt;
+                }
+            }
+        }
+
+
+        // Function to update style controls based on active element or global style
+        function updateStyleControls(inputElement) {
+            const styleControlsDiv = fontFamilySelect.closest('.style-controls');
+
+            // Hide/show signature/mark size controls
+            if (activeElement && (activeElement.type === 'signature' || activeElement.type === 'checkmark' || activeElement.type === 'cross')) {
+                signatureSizeControlsDiv.classList.add('active-selection');
+                // Set slider/number values to the actual width of the element's DOM div
+                // The slider is adjusted to reflect the outer div width, not just content
+                signatureWidthSlider.value = activeElement.width_css;
+                signatureWidthNumber.value = activeElement.width_css;
+            } else {
+                signatureSizeControlsDiv.classList.remove('active-selection');
+            }
+
+            // Show/hide general text style controls based on textbox/datebox selection
+            if (activeElement && (activeElement.type === 'textbox' || activeElement.type === 'datebox')) {
+                styleControlsDiv.classList.add('active-selection');
+                fontFamilySelect.value = inputElement.style.fontFamily || currentTextStyle.fontFamily;
+                fontSizeInput.value = parseInt(inputElement.style.fontSize) || parseInt(currentTextStyle.fontSize);
+                updateCurrentColorDisplay(inputElement.style.color || currentTextStyle.color);
+                updateActiveColorSquareInModal(inputElement.style.color || currentTextStyle.color);
+
+                if (inputElement.style.fontWeight === 'bold') boldBtn.classList.add('active');
+                else boldBtn.classList.remove('active');
+                if (inputElement.style.fontStyle === 'italic') italicBtn.classList.add('active');
+                else italicBtn.classList.remove('active');
+
+                // Keep currentTextStyle in sync for new elements based on selected element's style
+                currentTextStyle.fontFamily = fontFamilySelect.value;
+                currentTextStyle.fontSize = `${fontSizeInput.value}px`;
+                currentTextStyle.color = rgbToHex(inputElement.style.color); // Ensure hex for internal state
+                currentTextStyle.fontWeight = inputElement.style.fontWeight || 'normal';
+                currentTextStyle.fontStyle = inputElement.style.fontStyle || 'normal';
+
+            } else {
+                // Always show text style controls if no text element is active
+                // Reset to default/current global text style if no textbox/datebox is active
+                styleControlsDiv.classList.add('active-selection');
+                fontFamilySelect.value = currentTextStyle.fontFamily;
+                fontSizeInput.value = parseInt(currentTextStyle.fontSize);
+                updateCurrentColorDisplay(currentTextStyle.color);
+                updateActiveColorSquareInModal(currentTextStyle.color);
+                if (currentTextStyle.fontWeight === 'bold') boldBtn.classList.add('active');
+                else boldBtn.classList.remove('active');
+                if (currentTextStyle.fontStyle === 'italic') italicBtn.classList.add('active');
+                else italicBtn.classList.remove('active');
+            }
+        }
+
+
+        // --- Message Box Functions ---
+        function showMessageBox(message) {
+            document.getElementById('messageBoxText').innerText = message;
+            document.getElementById('messageBoxContainer').classList.add('show');
+        }
+
+        function hideMessageBox() {
+            document.getElementById('messageBoxContainer').classList.remove('show');
+        }
+
+        // --- Color Picker Modal Functions ---
+        function openColorPickerModal() {
+            colorPickerModalContainer.classList.add('show');
+            // Ensure active square is set when opening
+            updateActiveColorSquareInModal(currentTextStyle.color);
+        }
+
+        function closeColorPickerModal() {
+            colorPickerModalContainer.classList.remove('show');
+        }
+
+        // Close color picker if clicking outside the modal content
+        colorPickerModalContainer.addEventListener('click', (e) => {
+            if (e.target.id === 'colorPickerModalContainer') { // Check if clicked on backdrop
+                closeColorPickerModal();
+            }
+        });
+        // Close color picker on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && colorPickerModalContainer.classList.contains('show')) {
+                closeColorPickerModal();
+            }
+        });
+
+        // --- Signature Modal Functions ---
+        function openSignatureModal() {
+            document.getElementById('signatureModalContainer').classList.add('show');
+            clearSignatureDrawing();
+        }
+
+        function closeSignatureModal() {
+            document.getElementById('signatureModalContainer').classList.remove('show');
+        }
+
+        function applySignatureColor(color) {
+            signatureDrawColor = color;
+            sigCtx.strokeStyle = signatureDrawColor;
+            updateActiveSignatureDrawColorSquare(color);
+        }
+
+        function clearSignatureDrawing() {
+            sigCtx.clearRect(0, 0, signatureDrawingCanvas.width, signatureDrawingCanvas.height);
+            sigCtx.beginPath();
+            sigCtx.lineWidth = 2;
+            sigCtx.lineJoin = 'round';
+            sigCtx.lineCap = 'round';
+            sigCtx.strokeStyle = signatureDrawColor;
+        }
+
+        function addSignatureFromImage() {
+            const fileInput = document.getElementById('signatureImageUpload');
+            const file = fileInput.files[0];
+            if (!file) {
+                showMessageBox("Please select an image file to upload as signature.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Place signature at a default visual position (e.g., 50px from top/left of the viewer)
+                    addElement('signature', '', img.src, 50, 50);
+                    closeSignatureModal();
+                    fileInput.value = '';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addSignatureFromDrawing() {
+            const imageData = sigCtx.getImageData(0, 0, signatureDrawingCanvas.width, signatureDrawingCanvas.height);
+            const hasDrawing = Array.from(imageData.data).some(channel => channel !== 0);
+
+            if (hasDrawing) {
+                // Draw the signature onto a clean, temporary canvas to get a robust data URL
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = signatureDrawingCanvas.width;
+                tempCanvas.height = signatureDrawingCanvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(signatureDrawingCanvas, 0, 0); // Draw current content to temp canvas
+
+                // Place signature at a default visual position
+                addElement('signature', '', tempCanvas.toDataURL('image/png'), 50, 50);
+                closeSignatureModal();
+                clearSignatureDrawing();
+            } else {
+                showMessageBox("Please draw your signature first.");
+            }
+        }
+
+        // --- Signature/Mark Size Slider/Number Control Logic ---
+        function updateSignatureSize(newWidthValue, source) {
+            if (!activeElement || (activeElement.type !== 'signature' && activeElement.type !== 'checkmark' && activeElement.type !== 'cross') || !activeElement.element) return;
+
+            let newWidth_css_including_frame = parseFloat(newWidthValue);
+            if (isNaN(newWidth_css_including_frame)) {
+                console.warn("Invalid signature/mark width value.");
+                return;
+            }
+
+            // Ensure the input value covers at least the frame size for a minimum sensible content size
+            newWidth_css_including_frame = Math.max(20 + TOTAL_ELEMENT_FRAME_SIZE, Math.min(400 + TOTAL_ELEMENT_FRAME_SIZE, newWidth_css_including_frame));
+
+            // Use the element's stored aspectRatio for proportional resizing
+            const aspectRatio = activeElement.aspectRatio;
+            if (!aspectRatio) {
+                console.warn("Element has no aspectRatio. Cannot resize proportionally.");
+                return;
+            }
+
+            // Calculate content width from the total CSS width
+            const newContentWidth_css = newWidth_css_including_frame - TOTAL_ELEMENT_FRAME_SIZE;
+            let newContentHeight_css = newContentWidth_css / aspectRatio;
+
+            // Update element's CSS display size (including padding/border)
+            activeElement.element.style.width = `${newContentWidth_css + TOTAL_ELEMENT_FRAME_SIZE}px`;
+            activeElement.element.style.height = `${newContentHeight_css + TOTAL_ELEMENT_FRAME_SIZE}px`;
+
+            // Update stored CSS pixel dimensions (these represent the full div size)
+            activeElement.width_css = newWidth_css_including_frame;
+            activeElement.height_css = newContentHeight_css + TOTAL_ELEMENT_FRAME_SIZE;
+
+            // In this frontend-only-pixel-tracking approach, we don't update PDF dimensions here.
+            // PDF dimensions will be calculated on the backend.
+            activeElement.width_pdf = 0;
+            activeElement.height_pdf = 0;
+
+            // Sync other control if updated from one source (slider value should be the full CSS width)
+            if (source === 'slider') {
+                signatureWidthNumber.value = newWidth_css_including_frame.toFixed(0);
+            } else if (source === 'number') {
+                signatureWidthSlider.value = newWidth_css_including_frame.toFixed(0);
+            }
+        }
+
+        // NEW: SVG Definitions for Checkmark and Cross
+        const checkmarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+        const crossSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+
+
+        // NEW: Functions to add Checkmark and Cross
+        function addCheckmark() {
+            addElement('checkmark', checkmarkSvg, '', 50, 150); // Default position
+        }
+
+        function addCross() {
+            addElement('cross', crossSvg, '', 150, 150); // Default position
+        }
+
+
+        // --- Element Manipulation (Add, Drag, Remove, Select) ---
+        function addElement(type, textContent = '', imgSrcOrSvg = '', x_css_initial = 50, y_css_initial = 50) {
+            const elementId = `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+            const elementData = {
+                id: elementId,
+                type: type,
+                element: null, // Will be set after DOM creation in redrawElements
+                content: textContent || imgSrcOrSvg, // content can be text, image data URL, or SVG string
+                x_css: x_css_initial, // Initial CSS X relative to pdfViewer's scrollable content
+                y_css: y_css_initial, // Initial CSS Y relative to pdfViewer's scrollable content
+                width_css: 0, // Will be set by updateTextBoxDimensions or image/svg onload
+                height_css: 0, // Will be set by updateTextBoxDimensions or image/svg onload
+                x_pdf: 0, // No longer tracked in frontend, will be calculated on backend
+                y_pdf: 0, // No longer tracked in frontend, will be calculated on backend
+                width_pdf: 0, // No longer tracked in frontend, will be calculated on backend
+                height_pdf: 0, // No longer tracked in frontend, will be calculated on backend
+                style: (type === 'textbox' || type === 'datebox') ? { ...currentTextStyle } : {},
+                pageNum: pageNum, // Crucial: Ensure pageNum is correctly set for new elements
+                aspectRatio: null
+            };
+            elements.push(elementData);
+            console.log(`addElement: Element '${elementData.id}' added to array. Total elements: ${elements.length}`);
+
+            // Re-render all elements (including the new one) to ensure DOM and listeners are fresh
+            redrawElements();
+
+            // After redrawElements has run, the element's DOM node should exist and be active
+            const newElementDiv = document.getElementById(elementId);
+            if (newElementDiv) {
+                elementData.element = newElementDiv; // Update the elementData's reference
+
+                // For textboxes, calculate and set initial dimensions immediately
+                if (type === 'textbox' || type === 'datebox') {
+                    updateTextBoxDimensions(elementData);
+                } else if (type === 'signature' || type === 'checkmark' || type === 'cross') {
+                    // For images/SVGs, initial width/height will be set on content load by onload handler or immediately if SVG
+                    // Default CSS size to ensure the div is visible before content loads
+                    elementData.width_css = 50 + TOTAL_ELEMENT_FRAME_SIZE; // Default for check/cross
+                    elementData.height_css = 50 + TOTAL_ELEMENT_FRAME_SIZE;
+                    if (type === 'signature') { // Larger default for signature
+                        elementData.width_css = 150 + TOTAL_ELEMENT_FRAME_SIZE;
+                        elementData.height_css = 75 + TOTAL_ELEMENT_FRAME_SIZE;
+                    }
+                    newElementDiv.style.width = `${elementData.width_css}px`;
+                    newElementDiv.style.height = `${elementData.height_css}px`;
+
+                    // For SVGs, aspect ratio can be set immediately based on viewBox
+                    if (type === 'checkmark' || type === 'cross') {
+                         // Assuming a 24x24 viewBox for simplicity, or parse from actual SVG string
+                        elementData.aspectRatio = 1; // 24/24 = 1
+                    }
+                }
+
+                // Initial positioning of the element's outer div relative to pdfViewer's content
+                newElementDiv.style.left = `${x_css_initial}px`;
+                newElementDiv.style.top = `${y_css_initial}px`;
+
+                // Store the initial CSS pixel position (outer div)
+                elementData.x_css = x_css_initial;
+                elementData.y_css = y_css_initial;
+
+                // Select the newly added element
+                selectElement(elementId);
+
+                // Focus on the element if it's a textbox/datebox
+                if (type === 'textbox' || type === 'datebox') {
+                    const inputElement = newElementDiv.querySelector('input');
+                    if(inputElement) inputElement.focus();
+                }
+            } else {
+                console.error("addElement: Failed to find new element in DOM after redrawElements for initial setup:", elementId);
+            }
+        }
+
+
+        // Handles selection of an element
+        function selectElement(idToSelect) {
+            // Deselect previous active element
+            if (activeElement && activeElement.element) {
+                activeElement.element.classList.remove('selected');
+                // Ensure input blur for previously selected textbox to commit changes
+                if (activeElement.type === 'textbox' || activeElement.type === 'datebox') {
+                    const input = activeElement.element.querySelector('input');
+                    if (input) input.blur();
+                }
+            }
+
+            activeElement = null; // Reset active element to clear previous selection
+
+            if (idToSelect) {
+                activeElement = elements.find(el => el.id === idToSelect);
+                if (activeElement) { // Ensure the element data exists
+                    // IMPORTANT: We need to find the actual DOM element as it might have been recreated by redrawElements
+                    activeElement.element = document.getElementById(activeElement.id);
+                    if (activeElement.element) {
+                        activeElement.element.classList.add('selected');
+                    } else {
+                        console.warn(`selectElement: DOM node not found for element ID: ${idToSelect}. This might happen if it's on a different page.`);
+                        activeElement = null; // Cannot select if DOM node isn't there
+                    }
+                }
+            }
+            updateStyleControls(activeElement && (activeElement.type === 'textbox' || activeElement.type === 'datebox') ? activeElement.element.querySelector('input') : null);
+        }
+
+        // Global click listener to deselect elements if clicking outside
+        document.addEventListener('click', (e) => {
+            const isAnyModalOpen = document.querySelector('.modal-container.show');
+            if (isAnyModalOpen && e.target.closest('.modal-content')) {
+                return;
+            }
+
+            const isClickInsideSidebar = e.target.closest('.sidebar');
+            const isClickInsideEditableElement = e.target.closest('.editable-element');
+            const isClickInsideSignatureSizeControls = e.target.closest('#signatureSizeControls');
+            const isClickInsidePageNavigation = e.target.closest('.page-navigation');
+
+            if (!isClickInsideSidebar && !isClickInsideEditableElement && !isClickInsideSignatureSizeControls && !isClickInsidePageNavigation) {
+                selectElement(null); // Deselect everything if click is outside all relevant UI areas
+            }
+        });
+
+
+        function addTextBox() {
+            // Default position when adding a new element
+            addElement('textbox', 'New Text Box', '', 50, 50);
+        }
+
+        function addDateBox() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const formattedDate = `${month}/${day}/${year}`;
+
+            // Default position when adding a new element
+            addElement('datebox', formattedDate, '', 100, 100);
+        }
+
+        function removeElement(idToRemove) {
+            elements = elements.filter(el => {
+                if (el.id === idToRemove) {
+                    if (el === activeElement) {
+                        activeElement = null;
+                        updateStyleControls(null);
+                    }
+                    // Remove from DOM immediately
+                    if (el.element && el.element.parentNode) {
+                        el.element.parentNode.removeChild(el.element);
+                    }
+                    return false;
+                }
+                return true;
+            });
+            console.log("Element removed. Current elements array:", elements);
+        }
+
+        function redrawElements() {
+            // 1. Remove ALL existing editable elements from the DOM from the pdfViewer
+            pdfViewer.querySelectorAll('.editable-element').forEach(el => el.remove());
+
+            // 2. No scale calculations here, as coordinates are now pixel-based for display.
+            //    The backend will handle PDF point conversion.
+
+            // Calculate canvas's position relative to the pdfViewer (its offsetParent)
+            // These are used for initial placement and bounding checks.
+            const canvasRect = canvas.getBoundingClientRect();
+            const pdfViewerRect = pdfViewer.getBoundingClientRect();
+            const canvasX_in_viewer = canvasRect.left - pdfViewerRect.left;
+            const canvasY_in_viewer = canvasRect.top - pdfViewerRect.top;
+
+
+            // 3. Filter for elements belonging to the current page only
+            const currentElementsForDisplay = elements.filter(elData => {
+                return elData.pageNum === pageNum;
+            });
+            console.log(`redrawElements: Found ${currentElementsForDisplay.length} elements for page ${pageNum} to display.`);
+
+
+            // 4. Re-create and append DOM elements for the current page
+            currentElementsForDisplay.forEach(elData => {
+                let elementDiv = document.createElement('div');
+                elementDiv.className = 'editable-element';
+                elementDiv.id = elData.id;
+
+                let contentElement;
+                if (elData.type === 'textbox' || elData.type === 'datebox') {
+                    contentElement = document.createElement('input');
+                    contentElement.type = 'text';
+                    contentElement.value = elData.content;
+                    contentElement.placeholder = 'Type here...';
+                    Object.assign(contentElement.style, elData.style);
+
+                    contentElement.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+                    contentElement.addEventListener('touchstart', (e) => { e.stopPropagation(); });
+                    contentElement.addEventListener('focus', () => { selectElement(elData.id); });
+                    // When input content changes, update elementData and re-calculate dimensions
+                    contentElement.addEventListener('input', (e) => {
+                        elData.content = e.target.value;
+                        updateTextBoxDimensions(elData); // This recalculates CSS width/height for textboxes
+                    });
+
+                } else if (elData.type === 'signature') {
+                    contentElement = document.createElement('img');
+                    contentElement.src = elData.content; // data URL
+                    contentElement.alt = 'Signature';
+
+                    // Initial setting of full div size before image loads, to prevent 0x0 element
+                    // This is for display purposes, actual PDF dimensions are calculated later from content size.
+                    if (elData.width_css === 0 || elData.height_css === 0) {
+                        elementDiv.style.width = `${150 + TOTAL_ELEMENT_FRAME_SIZE}px`;
+                        elementDiv.style.height = `${75 + TOTAL_ELEMENT_FRAME_SIZE}px`;
+                    }
+
+                    contentElement.onload = () => {
+                        // This condition ensures we only re-calculate if dimensions were unknown or defaulted
+                        if (elData.width_css === 0 || elData.height_css === 0 || !elData.aspectRatio) {
+                            const initialContentWidth = contentElement.naturalWidth > 0 ? contentElement.naturalWidth : 150;
+                            const initialContentHeight = contentElement.naturalHeight > 0 ? contentElement.naturalHeight : 75;
+                            elData.aspectRatio = initialContentWidth / initialContentHeight;
+
+                            // Store full CSS size for the div (including padding/border)
+                            elData.width_css = initialContentWidth + TOTAL_ELEMENT_FRAME_SIZE;
+                            elData.height_css = initialContentHeight + TOTAL_ELEMENT_FRAME_SIZE;
+
+                            // Update element's style
+                            elementDiv.style.width = `${elData.width_css}px`;
+                            elementDiv.style.height = `${elData.height_css}px`;
+
+                            // In this frontend-only-pixel-tracking approach, we don't calculate PDF dimensions here.
+                            elData.width_pdf = 0;
+                            elData.height_pdf = 0;
+                        }
+                        // If this element was the active one, re-select it to update UI controls after image loads
+                        if (activeElement && activeElement.id === elData.id) {
+                            selectElement(elData.id);
+                        }
+                    };
+                    contentElement.onerror = function() {
+                        console.error("Error loading re-created signature image for element:", elData.id, elData.content.substring(0, 50) + "...");
+                        elementDiv.style.border = '2px dashed red';
+                        elementDiv.style.backgroundColor = 'pink';
+                        elementDiv.textContent = 'IMG ERROR';
+                    };
+                } else if (elData.type === 'checkmark' || elData.type === 'cross') {
+                    contentElement = document.createElement('div');
+                    contentElement.innerHTML = elData.content; // SVG string
+
+                    // Set default size and aspect ratio for checkmarks/crosses
+                    if (elData.width_css === 0 || elData.height_css === 0 || !elData.aspectRatio) {
+                        elData.width_css = 50 + TOTAL_ELEMENT_FRAME_SIZE; // Default size for mark
+                        elData.height_css = 50 + TOTAL_ELEMENT_FRAME_SIZE;
+                        elData.aspectRatio = 1; // Assuming 1:1 aspect ratio for checkmark/cross SVG
+                    }
+
+                    // Apply the size to the DOM element
+                    elementDiv.style.width = `${elData.width_css}px`;
+                    elementDiv.style.height = `${elData.height_css}px`;
+                }
+
+                // Create and append the remove button
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = 'x';
+                removeBtn.title = 'Remove element';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeElement(elData.id);
+                };
+
+                elementDiv.appendChild(removeBtn);
+                elementDiv.appendChild(contentElement); // Append content element inside the div
+
+                pdfViewer.appendChild(elementDiv);
+                elData.element = elementDiv; // Update reference to the newly created DOM node
+                addDragListeners(elementDiv, elData);
+
+                elementDiv.style.display = 'block';
+
+                // --- Positioning and Sizing on redraw (using stored CSS pixels) ---
+                // Position the elementDiv using its stored x_css and y_css (relative to pdfViewer's scrollable content)
+                elementDiv.style.left = `${elData.x_css}px`;
+                elementDiv.style.top = `${elData.y_css}px`;
+
+                // For sizing, use stored width_css and height_css (total outer dimensions)
+                elementDiv.style.width = `${elData.width_css}px`;
+                elementDiv.style.height = `${elData.height_css}px`;
+
+                // Update stored CSS pixel dimensions (these are for the *outer* div for convenience in drag/size operations)
+                elData.width_css = elementDiv.offsetWidth;
+                elData.height_css = elementDiv.offsetHeight;
+
+            });
+            console.log(`redrawElements: Redraw complete for page ${pageNum}. Final visible elements: ${currentElementsForDisplay.length}`);
+            // Re-select the previously active element if it's on the current page. This ensures UI controls are correct.
+            if (activeElement && activeElement.pageNum === pageNum) {
+                selectElement(activeElement.id);
+            }
+        }
+
+
+        // --- Dragging Logic ---
+        function addDragListeners(element, elementData) {
+            element.removeEventListener('mousedown', startDrag, false);
+            element.removeEventListener('touchstart', startDrag, { passive: false });
+
+            element.addEventListener('mousedown', startDrag, false);
+            element.addEventListener('touchstart', startDrag, { passive: false });
+
+            function startDrag(e) {
+                if (e.target.tagName === 'INPUT' || e.target.classList.contains('remove-btn')) {
+                    return;
+                }
+
+                selectElement(elementData.id);
+                activeElement = elementData; // Ensure activeElement is correctly set to the element being dragged
+
+                e.preventDefault();
+
+                isDragging = true;
+                elementData.element.classList.add('dragging');
+
+                const rect = elementData.element.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                document.addEventListener('mousemove', drag, false);
+                document.addEventListener('mouseup', endDrag, false);
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('touchend', endDrag, false);
+                document.addEventListener('touchcancel', endDrag, false);
+            }
+        }
+
+        function drag(e) {
+            if (!isDragging || !activeElement || !activeElement.element) return;
+            e.preventDefault();
+
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            // Get the current scroll position of the pdfViewer
+            const scrollLeft = pdfViewer.scrollLeft;
+            const scrollTop = pdfViewer.scrollTop;
+
+            // Calculate new desired position of the *outer div's* top-left corner relative to pdfViewer's scrollable content
+            // These are the raw CSS pixels relative to the top-left of the scrollable viewer content.
+            let newX_css_relative_to_viewer_content = clientX - offsetX - pdfViewer.getBoundingClientRect().left + scrollLeft;
+            let newY_css_relative_to_viewer_content = clientY - offsetY - pdfViewer.getBoundingClientRect().top + scrollTop;
+
+            // --- DRAGGING AREA FIX (using scrollWidth/scrollHeight) ---
+            // Constrain movement within the full scrollable area of the pdfViewer.
+            const minX = 0; // Element's left edge cannot go past the left of scrollable content
+            const minY = 0; // Element's top edge cannot go past the top of scrollable content
+
+            // Max X and Y are the right/bottom edge of the PDF content (inside pdf-viewer),
+            // minus the element's own full width/height.
+            // Use pdfViewer.scrollWidth/scrollHeight for the total scrollable content dimensions.
+            const constrainMaxX = pdfViewer.scrollWidth - activeElement.element.offsetWidth;
+            const constrainMaxY = pdfViewer.scrollHeight - activeElement.element.offsetHeight;
+
+            newX_css_relative_to_viewer_content = Math.max(minX, Math.min(newX_css_relative_to_viewer_content, constrainMaxX));
+            newY_css_relative_to_viewer_content = Math.max(minY, Math.min(newY_css_relative_to_viewer_content, constrainMaxY));
+            // --- END DRAGGING AREA FIX ---
+
+            // Apply the calculated position to the element's style (relative to its offsetParent, which is pdfViewer)
+            activeElement.element.style.left = `${newX_css_relative_to_viewer_content}px`;
+            activeElement.element.style.top = `${newY_css_relative_to_viewer_content}px`;
+
+            // --- Store Raw CSS Pixels (no PDF conversion yet) ---
+            // These values (x_css, y_css, width_css, height_css) are what will be sent to the backend.
+            activeElement.x_css = newX_css_relative_to_viewer_content;
+            activeElement.y_css = newY_css_relative_to_viewer_content;
+            activeElement.width_css = activeElement.element.offsetWidth;
+            activeElement.height_css = activeElement.element.offsetHeight;
+
+            // Clear PDF-specific coordinates here, as they are calculated on backend
+            activeElement.x_pdf = 0;
+            activeElement.y_pdf = 0;
+            activeElement.width_pdf = 0;
+            activeElement.height_pdf = 0;
+
+            if (activeElement.type === 'signature' || activeElement.type === 'checkmark' || activeElement.type === 'cross') {
+                signatureWidthSlider.value = activeElement.width_css.toFixed(0);
+                signatureWidthNumber.value = activeElement.width_css.toFixed(0);
+            }
+        }
+
+
+        function endDrag() {
+            isDragging = false;
+            if (activeElement) {
+                activeElement.element.classList.remove('dragging');
+            }
+            document.removeEventListener('mousemove', drag, false);
+            document.removeEventListener('mouseup', endDrag, false);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag, false);
+            document.removeEventListener('touchcancel', endDrag, false);
+        }
+
+        // --- Signature Drawing Logic ---
+        function setupDrawingCanvasListeners() {
+            signatureDrawingCanvas.addEventListener('mousedown', startDrawing, false);
+            signatureDrawingCanvas.addEventListener('mouseup', endDrawing, false);
+            signatureDrawingCanvas.addEventListener('mouseout', endDrawing, false);
+            signatureDrawingCanvas.addEventListener('mousemove', draw, false);
+
+            signatureDrawingCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+            signatureDrawingCanvas.addEventListener('touchend', endDrawing, false);
+            document.removeEventListener('touchcancel', endDrawing, false);
+            document.removeEventListener('touchmove', draw, { passive: false });
+        }
+        setupDrawingCanvasListeners();
+
+
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = getCanvasCoordinates(e, signatureDrawingCanvas);
+            sigCtx.beginPath();
+        }
+
+        function endDrawing() {
+            isDrawing = false;
+            sigCtx.stroke();
+            sigCtx.closePath();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+
+            let [currentX, currentY] = getCanvasCoordinates(e, signatureDrawingCanvas);
+
+            sigCtx.moveTo(lastX, lastY);
+            sigCtx.lineTo(currentX, currentY);
+            sigCtx.stroke();
+            [lastX, lastY] = [currentX, currentY];
+        }
+
+        function getCanvasCoordinates(e, targetCanvas) {
+            const rect = targetCanvas.getBoundingClientRect();
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+            const x = (clientX - rect.left) / rect.width * targetCanvas.width;
+            const y = (clientY - rect.top) / rect.height * targetCanvas.height;
+            return [x, y];
+        }
+
+
+        // --- PDF Rendering Functions ---
+        async function loadAndRenderPdf(url) {
+            try {
+                const loadingTask = pdfjsLib.getDocument(url);
+                pdfDoc = await loadingTask.promise;
+                pdfPageCount = pdfDoc.numPages;
+                pageNumSpan.textContent = pageNum;
+                pageCountSpan.textContent = pdfPageCount;
+                await renderPage(pageNum);
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                showMessageBox('Error loading PDF. Please ensure the file is valid.');
+            }
+        }
+
+        async function renderPage(num) {
+            if (!pdfDoc) return;
+
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: 1 });
+
+            currentPageDimensions.width = viewport.width;
+            currentPageDimensions.height = viewport.height;
+
+            const viewerWidth = pdfViewer.offsetWidth;
+            const scale = viewerWidth / viewport.width;
+            const scaledViewport = page.getViewport({ scale: scale });
+
+            canvas.height = scaledViewport.height;
+            canvas.width = scaledViewport.width;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: scaledViewport
+            };
+            await page.render(renderContext).promise;
+
+            redrawElements();
+        }
+
+        // Function to change the current page
+        function changePage(delta) {
+            let newPageNum = pageNum + delta;
+            if (newPageNum >= 1 && newPageNum <= pdfPageCount) {
+                selectElement(null);
+                pageNum = newPageNum;
+                pageNumSpan.textContent = pageNum;
+                renderPage(pageNum);
+            } else {
+                showMessageBox("No more pages in this direction.");
+            }
+        }
+
+
+        // --- Color Conversion Utility ---
+        function rgbToHex(rgb) {
+            if (!rgb || typeof rgb !== 'string') {
+                return '#000000';
+            }
+            if (rgb.startsWith('#')) {
+                return rgb;
+            }
+
+            const parts = rgb.match(/\d+/g);
+            if (parts && parts.length >= 3) {
+                let r = parseInt(parts[0]);
+                let g = parseInt(parts[1]);
+                let b = parseInt(parts[2]);
+
+                r = Math.min(255, Math.max(0, r));
+                g = Math.min(255, Math.max(0, g));
+                b = Math.min(255, Math.max(0, b));
+
+                return "#" +
+                       ("0" + r.toString(16)).slice(-2) +
+                       ("0" + g.toString(16)).slice(-2) +
+                       ("0" + b.toString(16)).slice(-2);
+            }
+            return '#000000';
+        }
+
+
+        // --- Save Functionality ---
+        async function savePdfWithChanges() {
+            selectElement(null);
+
+            const elementsToSave = elements.map(el => {
+                if (el.type === 'textbox' || el.type === 'datebox') {
+                    const inputElement = el.element ? el.element.querySelector('input') : null;
+                    if (inputElement) {
+                        el.content = inputElement.value;
+                        el.style.fontFamily = inputElement.style.fontFamily;
+                        el.style.fontSize = inputElement.style.fontSize;
+                        el.style.color = rgbToHex(inputElement.style.color);
+                        el.style.fontWeight = inputElement.style.fontWeight;
+                        el.style.fontStyle = inputElement.style.fontStyle;
+                        // Ensure dimensions are also updated for text elements right before saving
+                        updateTextBoxDimensions(el);
+                    }
+                }
+
+                // IMPORTANT: Send CSS pixel values (x_css, y_css, width_css, height_css) to backend.
+                // The backend will perform the conversion to PDF points and apply any necessary offsets.
+                return {
+                    id: el.id,
+                    type: el.type,
+                    content: el.content,
+                    x_css: el.x_css,
+                    y_css: el.y_css,
+                    width_css: el.width_css,
+                    height_css: el.height_css,
+                    style: el.style,
+                    pageNum: el.pageNum
+                };
+            }).filter(el => true);
+
+
+            console.log("Elements array before sending to backend:", elements);
+            console.log("Elements to save (after filter):", elementsToSave);
+
+            const payload = {
+                filename: originalFilename,
+                elements: elementsToSave,
+                // Also send the dimensions of the browser-rendered canvas (in CSS pixels)
+                // This is crucial for the backend to calculate the correct scaling factor.
+                browserCanvasDimensions: {
+                    width: canvas.offsetWidth,
+                    height: canvas.offsetHeight
+                },
+                // Send the original PDF's point dimensions (for backend's page orientation/size)
+                pdfNativeDimensions: {
+                    width: (await pdfDoc.getPage(1)).getViewport({ scale: 1 }).width,
+                    height: (await pdfDoc.getPage(1)).getViewport({ scale: 1 }).height
+                }
+            };
+
+            console.log("Sending payload to backend:", payload);
+
+            try {
+                const response = await fetch('/save_edited_pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    let downloadFilename = 'edited_document.pdf';
+                    if (contentDisposition) {
+                        const filenameMatch = contentDisposition.match(/filename\*?=['"]?(?:UTF-\d['"]*)?([^;\n"]*)['"]?;?/);
+                        if (filenameMatch && filenameMatch[1]) {
+                            downloadFilename = decodeURIComponent(filenameMatch[1]);
+                        }
+                    } else {
+                        downloadFilename = `edited_${originalFilename}`;
+                    }
+
+                    a.download = downloadFilename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+
+                    showMessageBox('PDF saved and download started!');
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error saving PDF:', response.status, errorText);
+                    showMessageBox(`Failed to save PDF: ${errorText || response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Network or unexpected error during PDF save:', error);
+                showMessageBox(`An error occurred while processing file: ${error.message}`);
+            }
+        }
+
+
+        // --- Navigation ---
+        function goBack() {
+            window.history.back();
+        }
+
+        function goHome() {
+            window.location.href = "/";
+        }
+
+        // --- Initial Load and Responsiveness ---
+        loadAndRenderPdf(pdfSourceUrl);
+
+        window.addEventListener('resize', () => {
+            if (pdfDoc) {
+                renderPage(pageNum);
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (currentObjectUrl) {
+                URL.revokeObjectURL(currentObjectUrl);
+            }
+        });
+
+        // Initialize style controls and color palette on page load
+        initializeColorPalette();
+        updateStyleControls(null);
+    </script>
+</body>
+</html>

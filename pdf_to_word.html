@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert PDF to Word</title>
+    <meta name="description" content="Easily convert PDF documents to editable Word files (DOC or DOCX) with Fixway. Fast, free, and secure online PDF to Word converter with high accuracy.">
+    <meta name="keywords" content="PDF to Word, convert PDF to Word, PDF to DOC, PDF to DOCX, online converter, Fixway PDF tools, free PDF to Word, editable Word from PDF">
+    <meta name="author" content="Fixway IT Solutions">
+    <style>
+        /* common.css */
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', sans-serif;
+            color: #000;
+            background: #fff;
+            text-align: center;
+            padding: 0 1em; /* This padding might interfere with full-width header/footer */
+            display: flex; /* Use flexbox for overall layout */
+            flex-direction: column; /* Stack children vertically */
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 20px;
+            background-color: #000;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 0 -20px; /* Adjust if body padding is kept */
+            padding-left: calc(20px + 30px);
+            padding-right: calc(20px + 30px);
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none; /* Ensure it doesn't look like a standard link */
+        }
+        .navbar .right-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar .right-nav-group a {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 15px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+        .navbar .right-nav-group a:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .navbar .login-button {
+            background-color: #000;
+            color: #fff;
+            width: 70px;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+            padding-bottom: 28px;
+        }
+        .navbar .login-button:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #000; /* Black background */
+            color: #fff;
+            padding: 30px 50px;
+            text-align: center;
+            position: relative; /* Needed for absolute positioning of the flag */
+            overflow: hidden; /* Hide anything that overflows */
+            margin: 0 -20px 0 -20px;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer .footer-links {
+            margin-top: 15px;
+        }
+        .footer .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .footer .footer-links a:hover {
+            color: #e53935;
+        }
+
+        /* Sri Lankan Flag Styling */
+        .sri-lankan-flag {
+            position: absolute;
+            top: auto; /* Corrected: was 'px' */
+            bottom: 35px; /* Adjust as needed for spacing from bottom */
+            right: 20px; /* Adjust as needed for spacing from right */
+            width: 60px; /* Flag width */
+            height: 30px; /* Flag height (approx 2:1 ratio) */
+            border: 1px solid #ccc; /* Small border for definition */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
+            z-index: 10; /* Ensure it's above other footer content if needed */
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                padding: 15px 20px;
+                margin: 0 -20px;
+            }
+            .navbar .logo {
+                font-size: 22px;
+            }
+            .footer {
+                padding: 20px 20px;
+                margin: 0 -20px 0 -20px;
+            }
+            .navbar .right-nav-group {
+                flex-grow: 1;
+                justify-content: flex-end;
+            }
+        }
+        @media (max-width: 576px) {
+            .navbar {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 10px 15px;
+                margin: 0 -15px;
+            }
+            .navbar .right-nav-group a,
+            .navbar .login-button {
+                flex-grow: 1;
+                text-align: center;
+            }
+            .footer {
+                padding: 15px 15px;
+                margin: 0 -15px 0 -15px;
+            }
+            .footer .footer-links a {
+                display: block;
+                margin: 5px 0;
+            }
+            .sri-lankan-flag {
+                width: 40px;
+                height: 20px;
+                bottom: 5px;
+                right: 5px;
+            }
+        }
+
+        main {
+            flex-grow: 1; /* Allows main content to take available space */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content vertically */
+            padding-bottom: 50px; /* Adjusted to create less space below the card */
+            padding-top: 50px; /* Adjusted to move the card up */
+        }
+
+        .card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        /* Styling for the drag and drop area */
+        .drag-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            margin: 20px 0;
+        }
+        .drag-area.highlight {
+            border-color: #007bff;
+            background-color: #e6f2ff;
+        }
+        .drag-area p {
+            margin: 0;
+            color: #666;
+            font-size: 1.1em;
+        }
+        .drag-area input[type="file"] {
+            display: none; /* Hide the default file input */
+        }
+        .file-name {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%; /* Make button full width */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            margin-top: 20px; /* Add margin to separate from drag area */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-to-home-btn {
+            background-color: #0c0c0c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: -20px auto 40px auto; /* Adjusted margin-top to pull it up, and margin-bottom to push footer down */
+        }
+
+        .back-to-home-btn:hover {
+            background-color: #666;
+        }
+
+        /* New styles for the main topic line */
+        .main-topic-line {
+            text-align: center;
+            margin-top: 30px; /* Space from navbar */
+            margin-bottom: 10px; /* Space before the SEO heading */
+        }
+
+        .main-topic-line h1 {
+            font-size: 2.5em; /* Bigger font size */
+            font-weight: bold;
+            color: #000; /* Black color */
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-topic-line h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-topic-line h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        /* SEO heading styles for PDF to Word page */
+        .seo-heading-container {
+            text-align: center;
+            padding: 10px 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .seo-heading-container h1 {
+            font-size: 16.5px;
+            color: #333;
+            margin: 0;
+            line-height: 1.2;
+            font-weight: normal;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .seo-heading-container h1 {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .seo-heading-container h1 {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+            <a href="{{ url_for('ai_page') }}">AI</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+
+    <!-- New Main Topic Line for PDF to Word -->
+    <div class="main-topic-line">
+        <h1>PDF to Word</h1>
+    </div>
+
+    <!-- SEO Heading Section for PDF to Word -->
+    <div class="seo-heading-container">
+        <h1>Convert PDFs to Editable Word Documents. Fast, Accurate, and Secure Online PDF to DOCX Conversion. Preserve Formatting and Layout Effortlessly.</h1>
+    </div>
+
+    <main>
+        <div class="card">
+            <h2>Convert PDF to Word</h2>
+            <form method="POST" enctype="multipart/form-data" id="convertPdfForm">
+                <div class="drag-area" id="dragAreaPdf">
+                    <p>Drag & Drop your PDF here or click to browse</p>
+                    <input type="file" name="pdf_file" accept=".pdf" required id="pdfFileInput">
+                    <span id="pdfFileName" class="file-name"></span>
+                </div>
+                <button type="submit">Convert</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Moved the "Back to Home" button here, between main and footer -->
+    <a href="{{ url_for('home') }}" class="back-to-home-btn">Back to Home</a>
+
+    <footer class="footer">
+        <p>&copy; 2025 Fixway PDF. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="{{ url_for('contact_page') }}">Contact Us</a>
+        </div>
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+
+    <script>
+        const dragAreaPdf = document.getElementById('dragAreaPdf');
+        const pdfFileInput = document.getElementById('pdfFileInput');
+        const pdfFileNameDisplay = document.getElementById('pdfFileName');
+        const convertPdfForm = document.getElementById('convertPdfForm');
+
+        // Prevent default drag behaviors for the drag area
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragAreaPdf.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Also prevent default drag behaviors for the entire document body
+        // to stop files from opening in the browser if dropped outside the drag area.
+        document.body.addEventListener('dragenter', preventDefaults, false);
+        document.body.addEventListener('dragover', preventDefaults, false);
+        document.body.addEventListener('dragleave', preventDefaults, false);
+        document.body.addEventListener('drop', preventDefaults, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drag area when file is dragged over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dragAreaPdf.addEventListener(eventName, () => dragAreaPdf.classList.add('highlight'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dragAreaPdf.addEventListener(eventName, () => dragAreaPdf.classList.remove('highlight'), false);
+        });
+
+        // Handle dropped files
+        dragAreaPdf.addEventListener('drop', handleDropPdf, false);
+
+        function handleDropPdf(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                // Ensure only PDF files are accepted
+                if (files[0].type === 'application/pdf') {
+                    pdfFileInput.files = files; // Assign dropped files to the input
+                    displayPdfFileName(files[0]);
+                } else {
+                    // Replaced alert with console.error as alerts are not recommended in iframes.
+                    console.error('Only PDF files are allowed for upload.');
+                    pdfFileInput.value = ''; // Clear the input
+                    pdfFileNameDisplay.textContent = '';
+                }
+            }
+        }
+
+        // Handle file selection via click (fallback)
+        dragAreaPdf.addEventListener('click', () => {
+            pdfFileInput.click();
+        });
+
+        pdfFileInput.addEventListener('change', () => {
+            if (pdfFileInput.files.length > 0) {
+                displayPdfFileName(pdfFileInput.files[0]);
+            } else {
+                pdfFileNameDisplay.textContent = '';
+            }
+        });
+
+        function displayPdfFileName(file) {
+            pdfFileNameDisplay.textContent = `Selected: ${file.name}`;
+        }
+    </script>
+</body>
+</html>

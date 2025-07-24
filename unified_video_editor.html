@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Video Editor</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+  /* Base styles for the video container */
+  .video-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background: #000;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    padding-top: 56.25%; /* Default 16:9 aspect ratio (9 / 16 * 100%) */
+  }
+  /* Styles for the video element inside the container */
+  .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Custom styles for the timeline thumbnails */
+  .timeline-thumbnail {
+    height: 100%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 0.25rem;
+    margin-right: 2px;
+  }
+
+  /* Styles for the draggable trim handles - Kept Cyan for accent */
+  .timeline-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background-color: #06b6d4; /* Cyan color for handles (tailwind cyan-500) */
+    cursor: ew-resize;
+    z-index: 10;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.7);
+  }
+
+  /* Style for the highlighted trim selection area */
+  .trim-selection {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(34, 197, 94, 0.3); /* Semi-transparent green overlay */
+    z-index: 5;
+    border-radius: 0.25rem;
+  }
+
+  /* Styles for the speed timeline canvas */
+  #speedCanvas {
+    background-color: #111827; /* gray-900 */
+    border-radius: 0.5rem;
+    cursor: crosshair;
+  }
+
+  /* Modal styles */
+  .modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.hidden {
+    display: none;
+  }
+  .modal-content {
+    background-color: #111827; /* gray-900 */
+    margin: auto;
+    padding: 20px;
+    border-radius: 0.75rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    width: 80%;
+    max-width: 500px;
+    color: #f3f4f6; /* gray-100 */
+    position: relative;
+  }
+  .close-button {
+    color: #d1d5db; /* gray-300 */
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .close-button:hover,
+  .close-button:focus {
+    color: #f9fafb; /* gray-50 */
+    text-decoration: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body class="bg-black text-gray-200 font-sans">
+
+<div class="flex flex-col lg:flex-row max-w-5xl mx-auto p-4 gap-4 min-h-screen">
+  <aside class="bg-gray-950 rounded-xl p-4 w-full lg:w-1/4 space-y-4 shadow-md">
+    <h2 class="text-xl font-semibold mb-2">🎬 Video Tools</h2>
+    <div class="space-y-2">
+      <input type="file" id="videoUpload" accept="video/*" class="w-full text-sm text-gray-300" />
+      <button onclick="handleVideoUpload()" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Load Video</button>
+    </div>
+    <div class="space-y-2 pt-2 border-t border-gray-800">
+      <button onclick="showControls('trimControls')" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">✂️ Trim Video</button>
+      <button onclick="showControls('speedControls')" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">⏩ Change Speed</button>
+      <button onclick="showControls('removeLogoControls')" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">🚫 Remove Logo (Area Selection)</button>
+      <button onclick="showControls('mergeControls')" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">➕ Merge Videos</button>
+      <button onclick="showControls('aspectRatioControls')" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">🖼️ Aspect Ratio</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 space-y-4">
+    <div id="playerSection" class="video-container shadow-md">
+      <video id="videoPlayer" controls></video>
+    </div>
+
+    <div class="bg-gray-950 rounded-xl p-3 shadow-md">
+      <div class="flex items-center justify-between text-sm">
+        <span>Start: <span id="currentStartTime" class="font-semibold">0.00</span>s</span>
+        <span>End: <span id="currentEndTime" class="font-semibold">0.00</span>s</span>
+      </div>
+      <div id="videoTimeline" class="mt-2 h-16 bg-gray-900 rounded overflow-x-auto flex items-center relative">
+        <div id="trimSelection" class="trim-selection"></div>
+        <div id="splitStartHandle" class="timeline-handle" style="left: 0;"></div>
+        <div id="splitEndHandle" class="timeline-handle" style="left: 100%;"></div>
+      </div>
+    </div>
+
+    <div id="controlsPanel" class="bg-gray-950 rounded-xl p-4 space-y-2 shadow-md">
+      <p id="uploadStatus" class="text-gray-400 text-xs"></p>
+
+      <div id="trimControls" class="hidden space-y-3 pt-3 border-t border-gray-800">
+        <h3 class="text-lg font-semibold">Trim Video</h3>
+        <div class="flex gap-2">
+          <label for="trimStartTime" class="flex-1">Start (s):
+            <input type="number" id="trimStartTime" value="0.00" step="0.01" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:border-blue-500" />
+          </label>
+          <label for="trimEndTime" class="flex-1">End (s):
+            <input type="number" id="trimEndTime" value="0.00" step="0.01" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:border-blue-500" />
+          </label>
+        </div>
+        <button onclick="performTrim()" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Preview Trim</button>
+        <button onclick="resetTrimPreview()" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Reset Trim Preview</button>
+        <button onclick="exportTrimmedVideo()" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Export Trimmed Video</button>
+        <p class="text-gray-500 text-sm">"Preview Trim" loops the selected segment. "Export Trimmed Video" sends the request to the server.</p>
+      </div>
+
+      <div id="speedControls" class="hidden space-y-3 pt-3 border-t border-gray-800">
+        <h3 class="text-lg font-semibold">Change Speed (Segment-based)</h3>
+        <div class="flex gap-2 items-end">
+          <label for="newSpeedTime" class="flex-1">Time (s):
+            <input type="number" id="newSpeedTime" value="0.00" step="0.01" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:border-blue-500" />
+          </label>
+          <label for="newSpeedValue" class="flex-1">Speed (x):
+            <input type="number" id="newSpeedValue" value="1.0" step="0.1" max="4.0" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:border-blue-500" />
+          </label>
+          <button onclick="addSpeedPoint()" class="bg-black text-gray-200 py-2 px-4 rounded-md flex-shrink-0 transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Add Point</button>
+        </div>
+        <div class="mt-4">
+          <h4 class="text-md font-semibold mb-2">Current Speed Points:</h4>
+          <ul id="speedPointsList" class="bg-gray-800 p-2 rounded max-h-32 overflow-y-auto">
+            <!-- Speed points will be listed here -->
+          </ul>
+        </div>
+        <button onclick="applySegmentSpeeds()" class="w-full bg-black text-gray-200 py-2 rounded-md mt-2 transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Apply Speed Changes</button>
+        <p class="text-gray-400 text-sm">Current Playback Speed: <span id="currentSpeedValue">1.0x</span></p>
+
+        <div class="mt-4">
+          <h4 class="text-md font-semibold mb-2">Visual Speed Timeline:</h4>
+          <canvas id="speedCanvas" class="w-full h-48"></canvas> <!-- Increased height here -->
+        </div>
+        <button id="downloadSpeedProcessedVideoBtn" onclick="downloadSpeedProcessedVideo()" class="w-full bg-black text-gray-200 py-2 rounded-md mt-2 transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white" disabled>Download Speed-Adjusted Video</button>
+      </div>
+
+      <div id="removeLogoControls" class="hidden space-y-3 pt-3 border-t border-gray-800">
+        <h3 class="text-lg font-semibold">🚫 Remove Logo (Area Selection)</h3>
+        <p class="text-red-400 text-sm">This feature (cropping/blurring) is currently unavailable due to underlying video processing library issues.</p>
+        <div class="flex gap-2 opacity-50 cursor-not-allowed">
+            <label for="cropX" class="flex-1">X:
+                <input type="number" id="cropX" value="0" step="1" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700" readonly disabled />
+            </label>
+            <label for="cropY" class="flex-1">Y:
+                <input type="number" id="cropY" value="0" step="1" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700" readonly disabled />
+            </label>
+        </div>
+        <div class="flex gap-2 opacity-50 cursor-not-allowed">
+            <label for="cropWidth" class="flex-1">Width:
+                <input type="number" id="cropWidth" value="0" step="1" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700" readonly disabled />
+            </label>
+            <label for="cropHeight" class="flex-1">Height:
+                <input type="number" id="cropHeight" value="0" step="1" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700" readonly disabled />
+            </label>
+        </div>
+        <button class="w-full bg-black text-gray-200 py-2 rounded-md opacity-50 cursor-not-allowed transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white" disabled>Apply Selection (will Crop)</button>
+        <button class="w-full bg-black text-gray-200 py-2 rounded-md opacity-50 cursor-not-allowed transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white" disabled>Reset Selection</button>
+      </div>
+
+      <div id="mergeControls" class="hidden space-y-3 pt-3 border-t border-gray-800">
+        <h3 class="text-lg font-semibold">➕ Merge Videos (Concatenate)</h3>
+        <p class="text-gray-400 text-sm">Select ALL video files you wish to merge. They will be joined end-to-end into a single output video. </p>
+        <p class="text-red-400 text-sm">**Note:** This feature performs video concatenation on the server. It does **NOT** support real-time multi-track video editing or simultaneous playback of multiple videos in the browser.</p>
+        <input type="file" id="mergeVideoUpload" accept="video/*" multiple class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700" />
+        <button onclick="performMerge()" class="w-full bg-black text-gray-200 py-2 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-700 hover:border-white hover:text-white">Merge Videos Now</button>
+      </div>
+
+      <div id="aspectRatioControls" class="hidden space-y-3 pt-3 border-t border-gray-800">
+        <h3 class="text-lg font-semibold">Set Aspect Ratio</h3>
+        <div class="space-y-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="aspectRatio" value="16:9" class="form-radio text-blue-600" checked onchange="applySelectedAspectRatio()">
+            <span class="ml-2">16:9 (Widescreen)</span>
+          </label>
+          <label class="inline-flex items-center ml-4">
+            <input type="radio" name="aspectRatio" value="4:3" class="form-radio text-blue-600" onchange="applySelectedAspectRatio()">
+            <span class="ml-2">4:3 (Standard)</span>
+          </label>
+          <label class="inline-flex items-center ml-4">
+            <input type="radio" name="aspectRatio" value="1:1" class="form-radio text-blue-600" onchange="applySelectedAspectRatio()">
+            <span class="ml-2">1:1 (Square)</span>
+          </label>
+          <label class="inline-flex items-center ml-4">
+            <input type="radio" name="aspectRatio" value="9:16" class="form-radio text-blue-600" onchange="applySelectedAspectRatio()">
+            <span class="ml-2">9:16 (Vertical)</span>
+          </label>
+          <label class="inline-flex items-center ml-4">
+            <input type="radio" name="aspectRatio" value="custom" class="form-radio text-blue-600" onchange="toggleCustomAspectRatioInputs()">
+            <span class="ml-2">Custom</span>
+          </label>
+        </div>
+        <div id="customAspectRatioInputs" class="flex gap-2 hidden">
+          <label for="customWidth" class="flex-1">Width:
+            <input type="number" id="customWidth" value="1920" min="1" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:border-blue-500" oninput="applyCustomAspectRatio()">
+          </label>
+          <label for="customHeight" class="flex-1">Height:
+            <input type="number" id="customHeight" value="1080" min="1" class="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 focus:outline-none focus:border-blue-500" oninput="applyCustomAspectRatio()">
+          </label>
+        </div>
+        <p class="text-gray-500 text-sm">Note: Changing aspect ratio adjusts the player frame. The video content will `object-fit: cover`.</p>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div id="messageModal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeMessageModal()">&times;</span>
+    <p id="modalMessage" class="text-lg font-semibold"></p>
+    <div id="modalDownloadLink" class="mt-4"></div>
+  </div>
+</div>
+
+<script>
+  // --- Global Variables ---
+  // Declared with 'var' to ensure they are hoisted and accessible globally
+  var isDraggingStartHandle;
+  var isDraggingEndHandle;
+  var videoPlayer;
+  var videoTimeline;
+  var splitStartHandle;
+  var splitEndHandle;
+  var trimSelection;
+  var trimStartTimeInput;
+  var trimEndTimeInput;
+  var currentStartTimeDisplay;
+  var currentEndTimeDisplay;
+  var uploadStatusElement;
+
+  var currentTrimStartTime = 0;
+  var currentTrimEndTime = 0;
+  var isTrimPreviewActive = false;
+
+  var speedPoints = []; // Array to store { time, speed } objects
+  var speedPointsListElement;
+  var currentSpeedValueSpan;
+  var speedCanvas;
+  var speedCanvasCtx;
+  var isDraggingSpeedPoint = false;
+  var draggingSpeedPointIndex = -1;
+  const SPEED_POINT_RADIUS = 8;
+  const MIN_SPEED = 0.1;
+  const MAX_SPEED = 4.0;
+
+  var uploadedVideoFile = null;
+  var processedSpeedVideoDownloadUrl = null; // New global variable for download URL
+
+  // --- Modal Functions (moved to top for accessibility) ---
+  function showMessageModal(message, downloadUrl = null) {
+    const modal = document.getElementById('messageModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalDownloadLink = document.getElementById('modalDownloadLink');
+
+    modalMessage.innerText = message;
+    modalDownloadLink.innerHTML = ''; // Clear previous link
+
+    if (downloadUrl) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = true; // Suggest download
+      link.innerText = 'Download Processed File';
+      link.classList.add('inline-block', 'bg-blue-500', 'hover:bg-blue-600', 'text-white', 'py-2', 'px-4', 'rounded-md', 'mt-4');
+      modalDownloadLink.appendChild(link);
+    }
+
+    modal.classList.remove('hidden');
+    console.log('Modal shown with message:', message);
+  }
+
+  function closeMessageModal() {
+    const modal = document.getElementById('messageModal');
+    modal.classList.add('hidden');
+    console.log('closeMessageModal called: Modal hidden.');
+  }
+
+  // --- Aspect Ratio Functions (moved to top for accessibility) ---
+  function applyAspectRatio(ratio) {
+    const playerSection = document.getElementById('playerSection');
+    playerSection.style.paddingTop = (ratio * 100) + '%';
+  }
+
+  function applySelectedAspectRatio() {
+    const selectedRatio = document.querySelector('input[name="aspectRatio"]:checked').value;
+    const customAspectRatioInputs = document.getElementById('customAspectRatioInputs');
+
+    customAspectRatioInputs.classList.add('hidden');
+
+    let ratio;
+    switch (selectedRatio) {
+      case '16:9':
+        ratio = 9 / 16;
+        break;
+      case '4:3':
+        ratio = 3 / 4;
+        break;
+      case '1:1':
+        ratio = 1 / 1;
+        break;
+      case '9:16':
+        ratio = 16 / 9;
+        break;
+      case 'custom':
+        customAspectRatioInputs.classList.remove('hidden');
+        applyCustomAspectRatio();
+        return;
+      default:
+        ratio = videoPlayer.videoHeight / videoPlayer.videoWidth;
+    }
+    applyAspectRatio(ratio);
+    uploadStatusElement.innerText = `Aspect ratio set to ${selectedRatio}`;
+  }
+
+  function toggleCustomAspectRatioInputs() {
+    const customAspectRatioInputs = document.getElementById('customAspectRatioInputs');
+    const customRadio = document.querySelector('input[name="aspectRatio"][value="custom"]');
+
+    if (customRadio.checked) {
+      customAspectRatioInputs.classList.remove('hidden');
+      applyCustomAspectRatio();
+    } else {
+      customAspectRatioInputs.classList.add('hidden');
+    }
+  }
+
+  function applyCustomAspectRatio() {
+    const customWidth = parseFloat(document.getElementById('customWidth').value);
+    const customHeight = parseFloat(document.getElementById('customHeight').value);
+
+    if (customWidth > 0 && customHeight > 0) {
+      const ratio = customHeight / customWidth;
+      applyAspectRatio(ratio);
+      uploadStatusElement.innerText = `Custom aspect ratio set to ${customWidth}:${customHeight}`;
+    } else {
+      uploadStatusElement.innerText = 'Please enter valid positive numbers for custom width and height.';
+    }
+  }
+
+  // --- Thumbnail Generation ---
+  async function generateThumbnails(videoElement) {
+    console.log('Starting thumbnail generation...');
+    const timeline = document.getElementById('videoTimeline');
+    timeline.querySelectorAll('.timeline-thumbnail').forEach(thumb => thumb.remove());
+    timeline.appendChild(trimSelection);
+    timeline.appendChild(splitStartHandle);
+    timeline.appendChild(splitEndHandle);
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    const thumbWidth = 80;
+    const thumbHeight = timeline.offsetHeight;
+
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+
+    const duration = videoElement.duration;
+    if (isNaN(duration) || duration <= 0) {
+        console.warn('Video duration is not available or zero. Cannot generate thumbnails.');
+        uploadStatusElement.innerText = 'Video duration not available for thumbnails.';
+        return;
+    }
+
+    const desiredNumThumbnails = Math.min(20, Math.max(5, Math.floor(timeline.offsetWidth / (thumbWidth + 2))));
+    const interval = duration / desiredNumThumbnails;
+
+    videoElement.controls = false;
+    videoElement.pause();
+
+    for (let i = 0; i < desiredNumThumbnails; i++) {
+      const time = i * interval;
+      console.log(`Attempting to generate thumbnail for time: ${time.toFixed(2)}s`);
+
+      try {
+        await new Promise((resolve, reject) => {
+          let hasResolved = false;
+
+          const onFrameReady = () => {
+            if (hasResolved) return;
+
+            try {
+              context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+              const dataURL = canvas.toDataURL('image/png');
+
+              const img = document.createElement('img');
+              img.src = dataURL;
+              img.classList.add('timeline-thumbnail');
+              img.style.width = `${thumbWidth}px`;
+              img.alt = `Thumbnail at ${time.toFixed(1)}s`;
+              timeline.insertBefore(img, trimSelection);
+              console.log(`Successfully drew thumbnail for ${time.toFixed(2)}s.`);
+              hasResolved = true;
+              resolve();
+            } catch (drawError) {
+              console.error(`Error drawing image for thumbnail at ${time.toFixed(2)}s:`, drawError);
+              hasResolved = true;
+              reject(drawError);
+            }
+          };
+
+          if ('requestVideoFrameCallback' in videoElement) {
+            videoElement.requestVideoFrameCallback(onFrameReady);
+            console.log(`Using requestVideoFrameCallback for ${time.toFixed(2)}s.`);
+          } else {
+            videoElement.addEventListener('seeked', onFrameReady, { once: true });
+            console.log(`Using seeked event for ${time.toFixed(2)}s.`);
+            setTimeout(() => {
+                if (!hasResolved) {
+                    console.warn(`Seeked event or requestVideoFrameCallback timed out for ${time.toFixed(2)}s. Attempting to draw anyway.`);
+                    onFrameReady();
+                }
+            }, 500);
+          }
+          videoElement.currentTime = time;
+        });
+      } catch (error) {
+        console.error(`Failed to generate thumbnail for time ${time.toFixed(2)}s:`, error);
+        uploadStatusElement.innerText = `Failed to generate some thumbnails. Check console.`;
+      }
+    }
+    videoElement.controls = true;
+    videoPlayer.currentTime = 0;
+    console.log('Thumbnail generation complete.');
+    uploadStatusElement.innerText = 'Video loaded and thumbnails generated.';
+  }
+
+  // --- handleVideoUpload function (moved to top for accessibility) ---
+  function handleVideoUpload() {
+    const fileInput = document.getElementById('videoUpload');
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      uploadedVideoFile = file;
+      const url = URL.createObjectURL(file);
+      videoPlayer.src = url;
+      videoPlayer.load();
+
+      videoPlayer.onloadedmetadata = () => {
+        console.log('Video metadata loaded. Duration:', videoPlayer.duration);
+        applyAspectRatio(9 / 16);
+        document.querySelector('input[name="aspectRatio"][value="16:9"]').checked = true;
+        document.getElementById('customAspectRatioInputs').classList.add('hidden');
+
+        document.getElementById('currentEndTime').innerText = videoPlayer.duration.toFixed(2);
+        trimEndTimeInput.value = videoPlayer.duration.toFixed(2);
+        trimStartTimeInput.value = 0.00;
+
+        requestAnimationFrame(() => {
+          splitStartHandle.style.left = '0px';
+          splitEndHandle.style.left = `${videoTimeline.offsetWidth - splitEndHandle.offsetWidth}px`;
+          updateTrimSelection();
+          updateTrimInputsFromHandles();
+        });
+
+        // Initialize speed points for a new video
+        speedPoints = [{ time: 0, speed: 1.0 }];
+        renderSpeedPoints();
+        drawSpeedTimeline();
+        videoPlayer.playbackRate = 1.0; // Reset playback rate
+        currentSpeedValueSpan.innerText = '1.0x';
+
+        generateThumbnails(videoPlayer);
+      };
+      // Add timeupdate listener for speed changes
+      videoPlayer.addEventListener('timeupdate', checkSpeedPoint);
+    }
+  }
+
+
+  // --- Event Listeners and Core Logic (DOMContentLoaded) ---
+  document.addEventListener('DOMContentLoaded', () => {
+    videoPlayer = document.getElementById('videoPlayer');
+    videoTimeline = document.getElementById('videoTimeline');
+    splitStartHandle = document.getElementById('splitStartHandle');
+    splitEndHandle = document.getElementById('splitEndHandle');
+    trimSelection = document.getElementById('trimSelection');
+    trimStartTimeInput = document.getElementById('trimStartTime');
+    trimEndTimeInput = document.getElementById('trimEndTime');
+    currentStartTimeDisplay = document.getElementById('currentStartTime');
+    currentEndTimeDisplay = document.getElementById('currentEndTime');
+    speedPointsListElement = document.getElementById('speedPointsList');
+    currentSpeedValueSpan = document.getElementById('currentSpeedValue');
+    speedCanvas = document.getElementById('speedCanvas');
+    speedCanvasCtx = speedCanvas.getContext('2d');
+    uploadStatusElement = document.getElementById('uploadStatus');
+
+    updateTrimSelection();
+
+    // Event listeners for dragging trim handles
+    splitStartHandle.addEventListener('mousedown', (e) => {
+      isDraggingStartHandle = true;
+      e.preventDefault();
+    });
+
+    splitEndHandle.addEventListener('mousedown', (e) => {
+      isDraggingEndHandle = true;
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDraggingStartHandle || isDraggingEndHandle) {
+        const timelineRect = videoTimeline.getBoundingClientRect();
+        let newX = e.clientX - timelineRect.left;
+
+        newX = Math.max(0, Math.min(timelineRect.width, newX));
+
+        if (isDraggingStartHandle) {
+          const endHandleLeft = splitEndHandle.offsetLeft;
+          const maxLeft = endHandleLeft - splitStartHandle.offsetWidth;
+          const finalX = Math.min(newX, maxLeft);
+          splitStartHandle.style.left = `${finalX}px`;
+        } else if (isDraggingEndHandle) {
+          const startHandleRight = splitStartHandle.offsetLeft + splitStartHandle.offsetWidth;
+          const minLeft = startHandleRight;
+          const finalX = Math.max(newX - splitEndHandle.offsetWidth, minLeft);
+          splitEndHandle.style.left = `${finalX}px`;
+        }
+        updateTrimInputsFromHandles();
+        updateTrimSelection();
+      } else if (isDraggingSpeedPoint) {
+        if (!videoPlayer.duration || isNaN(videoPlayer.duration) || videoPlayer.duration <= 0) {
+            uploadStatusElement.innerText = "Load a video first to adjust speed points.";
+            isDraggingSpeedPoint = false;
+            return;
+        }
+
+        const canvasRect = speedCanvas.getBoundingClientRect();
+        let mouseX = e.clientX - canvasRect.left;
+        let mouseY = e.clientY - canvasRect.top;
+
+        let newTime = (mouseX / speedCanvas.width) * videoPlayer.duration;
+        newTime = Math.max(0, Math.min(videoPlayer.duration, newTime));
+
+        // Map mouseY (pixel) to speed value
+        // mouseY = 0 (top) -> MAX_SPEED
+        // mouseY = speedCanvas.height (bottom) -> MIN_SPEED
+        let newSpeed = MAX_SPEED - ((mouseY / speedCanvas.height) * (MAX_SPEED - MIN_SPEED));
+        newSpeed = Math.max(MIN_SPEED, Math.min(MAX_SPEED, newSpeed));
+
+        speedPoints[draggingSpeedPointIndex].time = parseFloat(newTime.toFixed(2));
+        speedPoints[draggingSpeedPointIndex].speed = parseFloat(newSpeed.toFixed(1));
+
+        // Sort points to maintain order
+        speedPoints.sort((a, b) => a.time - b.time);
+
+        // Update dragging index after sort in case position changed
+        draggingSpeedPointIndex = speedPoints.findIndex(p => p.time === parseFloat(newTime.toFixed(2)) && p.speed === parseFloat(newSpeed.toFixed(1)));
+
+        drawSpeedTimeline();
+        renderSpeedPoints();
+      }
+      // Removed crop box drag/resize logic here
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDraggingStartHandle = false;
+      isDraggingEndHandle = false;
+      isDraggingSpeedPoint = false;
+      // Removed crop box drag/resize state resets here
+    });
+
+    trimStartTimeInput.addEventListener('input', updateHandlesFromTrimInputs);
+    trimEndTimeInput.addEventListener('input', updateHandlesFromTrimInputs);
+
+    // Initial setup for speed points (only if no video loaded yet)
+    if (!uploadedVideoFile) {
+        speedPoints.push({ time: 0, speed: 1.0 });
+        renderSpeedPoints();
+        drawSpeedTimeline();
+    }
+
+    // Event listeners for speed canvas
+    speedCanvas.addEventListener('mousedown', (e) => {
+      if (!videoPlayer.duration || isNaN(videoPlayer.duration) || videoPlayer.duration <= 0) {
+          showMessageModal("Please load a video first to add/edit speed points.");
+          return;
+      }
+      const canvasRect = speedCanvas.getBoundingClientRect();
+      const mouseX = e.clientX - canvasRect.left;
+      const mouseY = e.clientY - canvasRect.top;
+
+      // Check if clicking on an existing point
+      for (let i = 0; i < speedPoints.length; i++) {
+        const point = speedPoints[i];
+        const pointX = (point.time / videoPlayer.duration) * speedCanvas.width;
+        // Corrected: Use speedCanvas.height directly
+        const pointY = speedCanvas.height - ((point.speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * speedCanvas.height;
+
+        const distance = Math.sqrt(Math.pow(mouseX - pointX, 2) + Math.pow(mouseY - pointY, 2));
+        if (distance < SPEED_POINT_RADIUS + 2) { // Add some padding for easier clicking
+          isDraggingSpeedPoint = true;
+          draggingSpeedPointIndex = i;
+          e.preventDefault();
+          return;
+        }
+      }
+
+      // If not dragging an existing point, add a new one
+      if (!isDraggingSpeedPoint && videoPlayer.duration > 0) {
+        let newTime = (mouseX / speedCanvas.width) * videoPlayer.duration;
+        // Corrected: Use speedCanvas.height directly
+        let newSpeed = MAX_SPEED - ((mouseY / speedCanvas.height) * (MAX_SPEED - MIN_SPEED));
+        newSpeed = Math.max(MIN_SPEED, Math.min(MAX_SPEED, newSpeed));
+
+        // Check for existing point near this time to update instead of add
+        const existingIndex = speedPoints.findIndex(point => Math.abs(point.time - newTime) < 0.5); // 0.5s tolerance
+        if (existingIndex !== -1) {
+          speedPoints[existingIndex] = { time: parseFloat(newTime.toFixed(2)), speed: parseFloat(newSpeed.toFixed(1)) };
+          uploadStatusElement.innerText = `Updated speed point at ${newTime.toFixed(2)}s to ${newSpeed.toFixed(1)}x`;
+          console.log('Updated speed point:', speedPoints[existingIndex]);
+        } else {
+          speedPoints.push({ time: parseFloat(newTime.toFixed(2)), speed: parseFloat(newSpeed.toFixed(1)) });
+          uploadStatusElement.innerText = `Added speed point at ${newTime.toFixed(2)}s with speed ${newSpeed.toFixed(1)}x`;
+          console.log('Added new speed point:', speedPoints[speedPoints.length - 1]);
+        }
+        speedPoints.sort((a, b) => a.time - b.time);
+        renderSpeedPoints();
+        drawSpeedTimeline();
+      }
+    });
+
+    speedCanvas.addEventListener('dblclick', (e) => {
+      if (!videoPlayer.duration || isNaN(videoPlayer.duration) || videoPlayer.duration <= 0) {
+          showMessageModal("Please load a video first to remove speed points.");
+          return;
+      }
+      const canvasRect = speedCanvas.getBoundingClientRect();
+      const mouseX = e.clientX - canvasRect.left;
+      const mouseY = e.clientY - canvasRect.top;
+
+      for (let i = 0; i < speedPoints.length; i++) {
+        const point = speedPoints[i];
+        const pointX = (point.time / videoPlayer.duration) * speedCanvas.width;
+        // Corrected: Use speedCanvas.height directly
+        const pointY = speedCanvas.height - ((point.speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * speedCanvas.height;
+
+        const distance = Math.sqrt(Math.pow(mouseX - pointX, 2) + Math.pow(mouseY - pointY, 2));
+        if (distance < SPEED_POINT_RADIUS + 2) {
+          if (speedPoints.length > 1) { // Always keep at least one point
+            const removedPoint = speedPoints.splice(i, 1);
+            console.log('Removed speed point:', removedPoint[0]);
+            speedPoints.sort((a, b) => a.time - b.time); // Re-sort after removal
+            renderSpeedPoints();
+            drawSpeedTimeline();
+            uploadStatusElement.innerText = 'Speed point removed.';
+          } else {
+            uploadStatusElement.innerText = 'Cannot remove the last speed point.';
+          }
+          return;
+        }
+      }
+    });
+
+    // Removed crop box Event Listeners
+  }); // End DOMContentLoaded
+
+  // --- Trim Functions ---
+  function updateHandlesFromTrimInputs() {
+    const duration = videoPlayer.duration || 0;
+    const timelineWidth = videoTimeline.offsetWidth;
+
+    let startTime = parseFloat(trimStartTimeInput.value);
+    let endTime = parseFloat(trimEndTimeInput.value);
+
+    if (isNaN(startTime) || startTime < 0) startTime = 0;
+    if (isNaN(endTime) || endTime > duration || endTime < startTime) endTime = duration;
+
+    trimStartTimeInput.value = startTime.toFixed(2);
+    trimEndTimeInput.value = endTime.toFixed(2);
+
+    const startPx = (startTime / duration) * timelineWidth;
+    const endPx = (endTime / duration) * timelineWidth;
+
+    splitStartHandle.style.left = `${startPx}px`;
+    splitEndHandle.style.left = `${endPx - splitEndHandle.offsetWidth}px`;
+
+    updateTrimSelection();
+  }
+
+  function updateTrimInputsFromHandles() {
+    const duration = videoPlayer.duration || 0;
+    const timelineWidth = videoTimeline.offsetWidth;
+
+    const startHandleLeft = splitStartHandle.offsetLeft;
+    const endHandleLeft = splitEndHandle.offsetLeft;
+
+    const startTime = (startHandleLeft / timelineWidth) * duration;
+    const endTime = ((endHandleLeft + splitEndHandle.offsetWidth) / timelineWidth) * duration;
+
+    trimStartTimeInput.value = startTime.toFixed(2);
+    trimEndTimeInput.value = endTime.toFixed(2);
+
+    currentStartTimeDisplay.innerText = startTime.toFixed(2);
+    currentEndTimeDisplay.innerText = endTime.toFixed(2);
+
+    currentTrimStartTime = startTime;
+    currentTrimEndTime = endTime;
+  }
+
+  function updateTrimSelection() {
+    const startHandleLeft = splitStartHandle.offsetLeft;
+    const endHandleLeft = splitEndHandle.offsetLeft;
+    const startHandleWidth = splitStartHandle.offsetWidth;
+
+    const leftPos = startHandleLeft + startHandleWidth;
+    const width = endHandleLeft - leftPos;
+
+    trimSelection.style.left = `${leftPos}px`;
+    trimSelection.style.width = `${width}px`;
+  }
+
+  function loopTrimmedSegment() {
+    if (isTrimPreviewActive && videoPlayer.currentTime >= currentTrimEndTime) {
+      videoPlayer.currentTime = currentTrimStartTime;
+      videoPlayer.play();
+    }
+  }
+
+  function performTrim() {
+    currentTrimStartTime = parseFloat(trimStartTimeInput.value);
+    currentTrimEndTime = parseFloat(trimEndTimeInput.value);
+
+    if (!videoPlayer.src) {
+      uploadStatusElement.innerText = 'Please load a video first.';
+      return;
+    }
+
+    if (isNaN(currentTrimStartTime) || isNaN(currentTrimEndTime) || currentTrimStartTime < 0 || currentTrimEndTime > videoPlayer.duration || currentTrimStartTime >= currentTrimEndTime) {
+      uploadStatusElement.innerText = 'Invalid trim times. Please enter valid start and end times within the video duration.';
+      return;
+    }
+
+    resetTrimPreview();
+
+    videoPlayer.currentTime = currentTrimStartTime;
+    videoPlayer.play();
+    videoPlayer.addEventListener('timeupdate', loopTrimmedSegment);
+    isTrimPreviewActive = true;
+    uploadStatusElement.innerText = `Previewing trimmed segment from ${currentTrimStartTime.toFixed(2)}s to ${currentTrimEndTime.toFixed(2)}s.`;
+  }
+
+  function resetTrimPreview() {
+    videoPlayer.removeEventListener('timeupdate', loopTrimmedSegment);
+    isTrimPreviewActive = false;
+    videoPlayer.loop = false;
+    videoPlayer.currentTime = 0;
+    videoPlayer.play();
+    uploadStatusElement.innerText = 'Trim preview reset. Playing full video.';
+  }
+
+  async function exportTrimmedVideo() {
+    if (!uploadedVideoFile) {
+      showMessageModal('Please load a video first to export.');
+      return;
+    }
+
+    const startTime = parseFloat(trimStartTimeInput.value);
+    const endTime = parseFloat(trimEndTimeInput.value);
+    const outputFormat = 'mp4'; // Assuming MP4 for trimmed output
+
+    if (isNaN(startTime) || isNaN(endTime) || startTime < 0 || endTime > videoPlayer.duration || startTime >= endTime) {
+      showMessageModal('Invalid trim times for export. Please enter valid start and end times within the video duration.');
+      return;
+    }
+
+    showMessageModal('Exporting trimmed video... This may take a moment.');
+
+    const formData = new FormData();
+    formData.append('video_file', uploadedVideoFile);
+    formData.append('start_time', startTime);
+    formData.append('end_time', endTime);
+    formData.append('output_format', outputFormat);
+
+    try {
+      const response = await fetch(`${window.location.origin}/split-video`, { // Use absolute URL
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success && result.download_url) {
+        showMessageModal('Trimmed video exported successfully!', result.download_url);
+      } else {
+        throw new Error('Server did not return a download URL.');
+      }
+    } catch (error) {
+      console.error('Error exporting trimmed video:', error);
+      showMessageModal(`Failed to export video: ${error.message}`);
+    }
+  }
+
+  // --- Speed Functions ---
+  function addSpeedPoint() {
+    if (!videoPlayer.duration || isNaN(videoPlayer.duration) || videoPlayer.duration <= 0) {
+        showMessageModal("Please load a video first to add speed points.");
+        return;
+    }
+    const time = parseFloat(document.getElementById('newSpeedTime').value);
+    const speed = parseFloat(document.getElementById('newSpeedValue').value);
+
+    if (isNaN(time) || isNaN(speed) || time < 0 || time > videoPlayer.duration || speed <= 0) {
+        showMessageModal("Invalid time or speed value. Please enter valid numbers.");
+        return;
+    }
+
+    // Check if a point already exists at this time (or very close)
+    const existingIndex = speedPoints.findIndex(point => Math.abs(point.time - time) < 0.1); // 0.1s tolerance
+    if (existingIndex !== -1) {
+        speedPoints[existingIndex] = { time: parseFloat(time.toFixed(2)), speed: parseFloat(speed.toFixed(1)) };
+        uploadStatusElement.innerText = `Updated speed point at ${time.toFixed(2)}s to ${speed.toFixed(1)}x`;
+        console.log('Updated speed point:', speedPoints[existingIndex]);
+    } else {
+        speedPoints.push({ time: parseFloat(time.toFixed(2)), speed: parseFloat(speed.toFixed(1)) });
+        uploadStatusElement.innerText = `Added speed point at ${time.toFixed(2)}s with speed ${speed.toFixed(1)}x`;
+        console.log('Added new speed point:', speedPoints[speedPoints.length - 1]);
+    }
+
+    speedPoints.sort((a, b) => a.time - b.time);
+    renderSpeedPoints();
+    drawSpeedTimeline();
+  }
+
+  function renderSpeedPoints() {
+    speedPointsListElement.innerHTML = '';
+    if (speedPoints.length === 0) {
+      speedPointsListElement.innerHTML = '<li class="text-gray-500">No speed points added yet.</li>';
+      return;
+    }
+    speedPoints.forEach((point, index) => {
+      const li = document.createElement('li');
+      li.classList.add('flex', 'justify-between', 'items-center', 'py-1', 'px-2', 'rounded');
+      if (index % 2 === 0) {
+        li.classList.add('bg-gray-800'); /* Adjusted for dark theme */
+      } else {
+        li.classList.add('bg-gray-900'); /* Adjusted for dark theme */
+      }
+
+      li.innerHTML = `
+        <span>Time: ${point.time.toFixed(2)}s, Speed: ${point.speed.toFixed(1)}x</span>
+        <button onclick="removeSpeedPoint(${index})" class="text-red-400 hover:text-red-500 text-sm">Remove</button>
+      `;
+      speedPointsListElement.appendChild(li);
+    });
+  }
+
+  function removeSpeedPoint(index) {
+    if (speedPoints.length > 1) { // Always keep at least one point
+      const removedPoint = speedPoints.splice(index, 1);
+      console.log('Removed speed point:', removedPoint[0]);
+      speedPoints.sort((a, b) => a.time - b.time); // Re-sort after removal
+      renderSpeedPoints();
+      drawSpeedTimeline();
+      uploadStatusElement.innerText = 'Speed point removed.';
+    } else {
+      uploadStatusElement.innerText = 'Cannot remove the last speed point.';
+    }
+  }
+
+  function checkSpeedPoint() {
+    if (!videoPlayer || !videoPlayer.duration || isNaN(videoPlayer.duration)) return;
+
+    const currentTime = videoPlayer.currentTime;
+    let targetSpeed = 1.0; // Default to normal speed
+
+    // Find the active speed segment
+    for (let i = 0; i < speedPoints.length - 1; i++) {
+        const p1 = speedPoints[i];
+        const p2 = speedPoints[i + 1];
+
+        if (currentTime >= p1.time && currentTime < p2.time) {
+            // Linear interpolation between two points
+            const timeDiff = p2.time - p1.time;
+            const speedDiff = p2.speed - p1.speed;
+            const progress = (currentTime - p1.time) / timeDiff;
+            targetSpeed = p1.speed + (speedDiff * progress);
+            break;
+        }
+    }
+    // If current time is beyond the last speed point
+    if (speedPoints.length > 0 && currentTime >= speedPoints[speedPoints.length - 1].time) {
+        targetSpeed = speedPoints[speedPoints.length - 1].speed;
+    } else if (speedPoints.length === 0) {
+        targetSpeed = 1.0; // Default to 1.0 if no points
+    }
+
+
+    // Apply the speed, clamping to browser limits (usually 0.0625 to 16)
+    videoPlayer.playbackRate = Math.max(0.0625, Math.min(16, targetSpeed));
+    currentSpeedValueSpan.innerText = `${videoPlayer.playbackRate.toFixed(2)}x`;
+    console.log(`Current Time: ${currentTime.toFixed(2)}s, Target Speed: ${targetSpeed.toFixed(2)}x, Actual Playback Rate: ${videoPlayer.playbackRate.toFixed(2)}x`);
+  }
+
+
+  function drawSpeedTimeline() {
+    if (!speedCanvas || !speedCanvasCtx || !videoPlayer.duration || isNaN(videoPlayer.duration) || videoPlayer.duration <= 0) {
+        speedCanvas.width = speedCanvas.offsetWidth;
+        speedCanvas.height = speedCanvas.offsetHeight;
+        speedCanvasCtx.clearRect(0, 0, speedCanvas.width, speedCanvas.height);
+        speedCanvasCtx.fillStyle = '#9ca3af';
+        speedCanvasCtx.font = '14px Arial';
+        speedCanvasCtx.textAlign = 'center';
+        speedCanvasCtx.fillText('Load a video to edit speed.', speedCanvas.width / 2, speedCanvas.height / 2);
+        return;
+    }
+
+    speedCanvas.width = speedCanvas.offsetWidth;
+    speedCanvas.height = speedCanvas.offsetHeight;
+    const canvasWidth = speedCanvas.width;
+    const canvasHeight = speedCanvas.height;
+    const videoDuration = videoPlayer.duration;
+
+    speedCanvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+    // Draw background grid/lines
+    speedCanvasCtx.strokeStyle = '#6b7280'; /* gray-500 */
+    speedCanvasCtx.lineWidth = 1;
+
+    // Draw horizontal lines for speed markers
+    const speedMarkers = [0.5, 1.0, 2.0, 3.0, 4.0];
+    speedMarkers.forEach(markerSpeed => {
+        if (markerSpeed >= MIN_SPEED && markerSpeed <= MAX_SPEED) {
+            const y = canvasHeight - ((markerSpeed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * canvasHeight;
+            speedCanvasCtx.beginPath();
+            speedCanvasCtx.moveTo(0, y);
+            speedCanvasCtx.lineTo(canvasWidth, y);
+            speedCanvasCtx.stroke();
+            speedCanvasCtx.fillStyle = '#d1d5db'; /* gray-300 for clarity */
+            speedCanvasCtx.font = '14px Arial'; /* Increased font size */
+            speedCanvasCtx.textAlign = 'left'; /* Align to left */
+            speedCanvasCtx.fillText(`${markerSpeed.toFixed(1)}x`, 5, y - 2); /* Adjusted x position */
+        }
+    });
+
+    // Draw vertical lines for time markers (e.g., every 5 seconds)
+    const timeInterval = Math.max(1, Math.floor(videoDuration / 10)); // Adjust interval based on duration
+    for (let t = 0; t <= videoDuration; t += timeInterval) {
+        const x = (t / videoDuration) * canvasWidth;
+        speedCanvasCtx.beginPath();
+        speedCanvasCtx.moveTo(x, 0);
+        speedCanvasCtx.lineTo(x, canvasHeight);
+        speedCanvasCtx.stroke();
+        speedCanvasCtx.fillStyle = '#d1d5db'; /* gray-300 for clarity */
+        speedCanvasCtx.font = '14px Arial'; /* Increased font size */
+        speedCanvasCtx.textAlign = 'center'; /* Centered */
+        speedCanvasCtx.fillText(`${t.toFixed(0)}s`, x, canvasHeight - 5); /* Adjusted y position */
+    }
+
+
+    // Draw the speed curve
+    speedCanvasCtx.beginPath();
+    speedCanvasCtx.strokeStyle = '#8b5cf6'; // purple-500 (kept vibrant for graph)
+    speedCanvasCtx.lineWidth = 2;
+
+    if (speedPoints.length > 0) {
+        // Start from the first point
+        const firstPointX = (speedPoints[0].time / videoDuration) * canvasWidth;
+        const firstPointY = canvasHeight - ((speedPoints[0].speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * canvasHeight;
+        speedCanvasCtx.moveTo(firstPointX, firstPointY);
+
+        // Draw line segments between points
+        for (let i = 0; i < speedPoints.length; i++) {
+            const p = speedPoints[i];
+            const x = (p.time / videoDuration) * canvasWidth;
+            const y = canvasHeight - ((p.speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * canvasHeight;
+            speedCanvasCtx.lineTo(x, y);
+        }
+    }
+    speedCanvasCtx.stroke();
+
+    // Draw speed points
+    speedCanvasCtx.fillStyle = '#c084fc'; // purple-400 (kept vibrant for graph)
+    speedPoints.forEach(p => {
+        const x = (p.time / videoDuration) * canvasWidth;
+        const y = canvasHeight - ((p.speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * canvasHeight;
+        speedCanvasCtx.beginPath();
+        speedCanvasCtx.arc(x, y, SPEED_POINT_RADIUS, 0, Math.PI * 2);
+        speedCanvasCtx.fill();
+        speedCanvasCtx.strokeStyle = '#5b21b6'; // purple-700
+        speedCanvasCtx.lineWidth = 1;
+        speedCanvasCtx.stroke();
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    // Redraw timeline on resize if speed controls are visible
+    if (!document.getElementById('speedControls').classList.contains('hidden')) {
+      drawSpeedTimeline();
+    }
+  });
+
+  async function applySegmentSpeeds() {
+    if (!uploadedVideoFile) {
+      showMessageModal('Please load a video first to apply speed changes.');
+      return;
+    }
+    if (speedPoints.length < 1) {
+      showMessageModal('Please add at least one speed point.');
+      return;
+    }
+
+    showMessageModal('Applying speed changes... This may take a moment.');
+    document.getElementById('downloadSpeedProcessedVideoBtn').disabled = true; // Disable download button during processing
+
+    // Prepare speed points for backend: convert to a simpler array of objects
+    // Ensure times are within video duration
+    const videoDuration = videoPlayer.duration;
+    const cleanedSpeedPoints = speedPoints.map(p => ({
+        time: Math.max(0, Math.min(videoDuration, p.time)),
+        speed: Math.max(MIN_SPEED, Math.min(MAX_SPEED, p.speed))
+    }));
+    cleanedSpeedPoints.sort((a, b) => a.time - b.time); // Ensure sorted
+
+    const formData = new FormData();
+    formData.append('video_file', uploadedVideoFile);
+    formData.append('speed_points', JSON.stringify(cleanedSpeedPoints)); // Send as JSON string
+    formData.append('output_format', 'mp4'); // Assuming MP4 output for speed change
+
+    try {
+      const response = await fetch(`${window.location.origin}/process-speed-change-video`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success && result.download_url) {
+        processedSpeedVideoDownloadUrl = result.download_url; // Store the URL
+        document.getElementById('downloadSpeedProcessedVideoBtn').disabled = false; // Enable download button
+        showMessageModal('Video speed changed successfully!', result.download_url);
+      } else {
+        throw new Error('Server did not return a download URL.');
+      }
+    } catch (error) {
+      console.error('Error applying speed changes:', error);
+      showMessageModal(`Failed to apply speed changes: ${error.message}`);
+      document.getElementById('downloadSpeedProcessedVideoBtn').disabled = true; // Ensure disabled on error
+    }
+  }
+
+  function downloadSpeedProcessedVideo() {
+    if (processedSpeedVideoDownloadUrl) {
+      const link = document.createElement('a');
+      link.href = processedSpeedVideoDownloadUrl;
+      link.download = 'speed_adjusted_video.mp4'; // Suggest a filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showMessageModal('Download initiated!');
+    } else {
+      showMessageModal('No speed-adjusted video available for download. Please apply speed changes first.');
+    }
+  }
+
+
+  // --- Remove Logo (Crop) Functions (Disabled) ---
+  // All crop box related JS functions are now stubbed or removed from event listeners
+  // as the feature is disabled.
+  function initCropSelectionBox() {
+    // No operation as functionality is disabled
+  }
+
+  function resetRemoveLogoSelection() {
+    showMessageModal('Remove Logo controls are currently disabled.');
+  }
+
+  function handleCropBoxMousedown(e) {
+    showMessageModal('Remove Logo controls are currently disabled.');
+  }
+
+  function handleCropBoxMove(e) {
+    // No operation as functionality is disabled
+  }
+
+  function updateCropInputsFromBox() {
+    // No operation as functionality is disabled
+  }
+
+  async function applyRemoveLogo() {
+    showMessageModal('Remove Logo (cropping/blurring) is currently unavailable due to underlying video processing library issues.');
+  }
+
+
+  // --- Merge Videos Function ---
+  async function performMerge() {
+      const mergeVideoInput = document.getElementById('mergeVideoUpload');
+      const files = mergeVideoInput.files;
+
+      if (files.length < 2) {
+          showMessageModal('Please select at least two video files to merge.');
+          return;
+      }
+
+      showMessageModal('Merging videos... This may take a moment.');
+      uploadStatusElement.innerText = `Merging ${files.length} videos...`;
+
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+          formData.append('video_files', files[i]);
+      }
+      formData.append('output_format', 'mp4');
+
+      try {
+          const response = await fetch(`${window.location.origin}/merge-video`, {
+              method: 'POST',
+              body: formData,
+          });
+
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.success && result.download_url) {
+              showMessageModal('Videos merged successfully!', result.download_url);
+          } else {
+              throw new Error('Server did not return a download URL.');
+          }
+      } catch (error) {
+          console.error('Error merging videos:', error);
+          showMessageModal(`Failed to merge videos: ${error.message}`);
+      }
+  }
+
+  // --- Utility Functions for showing/hiding controls ---\
+  function showControls(panelId) {
+    const allPanels = ['trimControls', 'speedControls', 'removeLogoControls', 'mergeControls', 'aspectRatioControls'];
+
+    allPanels.forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+
+    document.getElementById(panelId).classList.remove('hidden');
+    uploadStatusElement.innerText = 'Showing: ' + panelId.replace('Controls', ' Controls').replace('removeLogo', 'Remove Logo');
+
+    // Special handling for speed controls to draw the timeline
+    if (panelId === 'speedControls') {
+      drawSpeedTimeline();
+    } else if (panelId === 'removeLogoControls') {
+      // No initCropSelectionBox call as functionality is disabled
+    }
+  }
+
+</script>
+</body>
+</html>

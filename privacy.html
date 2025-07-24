@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHND0H216B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-QHND0H216B');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Fixway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Ensure consistent footer styling */
+        .footer {
+            background-color: #000;
+            color: #fff;
+            padding: 30px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin: 0; /* Remove negative margin as body padding is 0 */
+            width: 100%;
+        }
+        /* Styling for the logo within the navbar */
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            /* Add cursor pointer to indicate it's clickable */
+            cursor: pointer;
+            text-decoration: none; /* This is the key change to remove the underline */
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between; /* Pushes logo to left, button group to right */
+            align-items: center;
+            padding: 15px 50px;
+            background-color: #000; /* Black background */
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 0 -20px;
+            padding-left: calc(20px + 30px);
+            padding-right: calc(20px + 30px);
+        }
+        /* New container for AI, About Us, and Login buttons */
+        .navbar .right-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 20px; /* Space between AI, About Us, and Login buttons */
+        }
+
+        /* Styling for the new AI and About Us buttons/links */
+        .navbar .right-nav-group a { /* Target links within the new group */
+            background-color: #000;
+            color: #fff;
+            padding: 8px 15px;
+            text-decoration: none;
+            border: 1px solid transparent; /* Transparent border by default */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            /* Only transition border-color and transform */
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Hover effect for the new buttons: white border appears */
+        .navbar .right-nav-group a:hover {
+            border-color: #fff; /* White border on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        /* Styling for the login button - MODIFIED to match other buttons */
+        .navbar .login-button {
+            background-color: #000;
+            color: #fff;
+            padding: 8px 20px;
+            border: 1px solid transparent; /* Changed to transparent border by default */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            /* Only transition border-color and transform */
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+        /* Hover effect for the login button - MODIFIED to match other buttons */
+        .navbar .login-button:hover {
+            border-color: #fff; /* White border on hover */
+            transform: translateY(-2px);
+        }
+
+
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer .footer-links {
+            margin-top: 15px;
+        }
+        .footer .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .footer .footer-links a:hover {
+            color: #e53935;
+        }
+        .sri-lankan-flag {
+            position: absolute;
+            bottom: 35px;
+            right: 20px;
+            width: 60px;
+            height: 30px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            border-radius: 0px; /* Tailwind 'rounded-md' */
+        }
+        @media (max-width: 768px) {
+            .footer {
+                padding: 20px 20px;
+            }
+            .sri-lankan-flag {
+                width: 50px;
+                height: 25px;
+                bottom: 8px;
+                right: 8px;
+            }
+        }
+        @media (max-width: 576px) {
+            .footer {
+                padding: 15px 15px;
+            }
+            .footer .footer-links a {
+                display: block;
+                margin: 5px 0;
+            }
+            .sri-lankan-flag {
+                width: 40px;
+                height: 20px;
+                bottom: 5px;
+                right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" class="logo">Fixway</a>
+        <div class="right-nav-group">
+            <a href="{{ url_for('ai_page') }}">AI</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+            <button class="login-button" onclick="openModal()">Login</button>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-extrabold text-center mb-8">Privacy Policy</h1>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">1. Introduction</h2>
+            <p class="mb-4">Welcome to Fixway. We are committed to protecting your privacy and handling your data in an open and transparent manner. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website fixway.com, including any other media form, media channel, mobile website, or mobile application related or connected thereto (collectively, the "Site"). Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the Site.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">2. Information We Collect</h2>
+            <p class="mb-2">We may collect information about you in a variety of ways. The information we may collect on the Site includes:</p>
+            <h3 class="text-xl font-semibold mt-4 mb-2">Personal Data</h3>
+            <p class="mb-4">Personally identifiable information, such as your name, shipping address, email address, and telephone number, and demographic information, such as your age, gender, hometown, and interests, that you voluntarily give to us when you register with the Site or when you choose to participate in various activities related to the Site, such as online chat and message boards. **Please refer to Section 2.1 "Starter Period and Current Data Collection Practices" for current practices regarding personal data collection.**</p>
+            <h3 class="text-xl font-semibold mt-4 mb-2">Derivative Data</h3>
+            <p class="mb-4">Information our servers automatically collect when you access the Site, such as your IP address, your browser type, your operating system, your access times, and the pages you have viewed directly before and after accessing the Site.</p>
+            <h3 class="text-xl font-semibold mt-4 mb-2">Financial Data</h3>
+            <p class="mb-4">Financial information, such as data related to your payment method (e.g., valid credit card number, card brand, expiration date) that we may collect when you purchase, order, return, exchange, or request information about our services from the Site. **Please refer to Section 2.1 "Starter Period and Current Data Collection Practices" for current practices regarding financial data collection.**</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">2.1. Starter Period and Current Data Collection Practices</h2>
+            <p class="mb-4">Please note that Fixway is currently in its **starter period**. During this phase, we have **not yet implemented any payment options**, and therefore, we **do not collect any financial data or payment-related information** from our users. We will inform our clients and users when payment options are officially launched and integrated into our services. At that time, this Privacy Policy will be updated to reflect our data collection practices related to payments.</p>
+            <p class="mb-4">Furthermore, during this starter period, we want to assure our users that **we do not actively collect any personal data from you beyond what is strictly necessary for the functionality of our tools (e.g., temporary file processing for conversions).** Any data processed by our tools is handled in a temporary and ephemeral manner, and is not stored or retained after the service is rendered, unless explicitly stated otherwise for a specific feature and with your consent. For example, if you register an account, we will collect your email address for account management. This section clarifies the data collection practices specifically during our current "starter period" in relation to the general categories mentioned in Section 2.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">2.2. Handling of Sensitive or High-Value Documents</h2>
+            <p class="mb-4">We are committed to protecting your privacy and the confidentiality of your documents. We want to reiterate that **we never share any user details or document content with third parties.** Our services are designed to process your files securely and temporarily, without retaining them.</p>
+            <p class="mb-4">However, if you intend to use our services for **highly sensitive or high-value documents** such as property deeds, project proposals, government notes, or other critical legal/financial instruments, we strongly recommend that you **contact us before utilizing our services.** This allows us to discuss your specific needs and any additional security considerations you may have. You can reach out to us via our <a href="{{ url_for('contact_page') }}" class="text-blue-600 hover:underline">Contact Us</a> page, and we will get in touch with you to address your concerns and provide guidance.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">3. How We Use Your Information</h2>
+            <p class="mb-2">Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to:</p>
+            <ul class="list-disc list-inside ml-4">
+                <li>Create and manage your account.</li>
+                <li>Email you regarding your account or order.</li>
+                <li>Enable user-to-user communications.</li>
+                <li>Fulfill and manage purchases, orders, payments, and other transactions related to the Site.</li>
+                <li>Generate a personal profile about you to make your visit to the Site more personalized.</li>
+                <li>Increase the efficiency and operation of the Site.</li>
+                <li>Monitor and analyze usage and trends to improve your experience with the Site.</li>
+                <li>Notify you of updates to the Site.</li>
+                <li>Offer new products, services, mobile applications, and/or recommendations to you.</li>
+                <li>Perform other business activities as needed.</li>
+            </ul>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">4. Disclosure of Your Information</h2>
+            <p class="mb-2">We may share information we have collected about you in certain situations. Your information may be disclosed as follows:</p>
+            <h3 class="text-xl font-semibold mt-4 mb-2">By Law or to Protect Rights</h3>
+            <p class="mb-4">If we believe the release of information about you is necessary to respond to legal process, to investigate or remedy potential violations of our policies, or to protect the rights, property, or safety of others, we may share your information as permitted or required by any applicable law, rule, or regulation.</p>
+            <h3 class="text-xl font-semibold mt-4 mb-2">Third-Party Service Providers</h3>
+            <p class="mb-4">We may share your information with third parties that perform services for us or on our behalf, including payment processing (when applicable), data analysis, email delivery, hosting services, customer service, and marketing assistance.</p>
+            <h3 class="text-xl font-semibold mt-4 mb-2">Third-Party Advertisers (e.g., Google AdSense)</h3>
+            <p class="mb-4">We may use third-party advertising companies to serve ads when you visit our Site. These companies may use information about your visits to this and other websites that are contained in **web cookies and other tracking technologies** in order to provide advertisements about goods and services of interest to you. For example, Google, as a third-party vendor, uses cookies to serve ads on our Site. **Google's use of the DoubleClick DART cookie** enables it to serve ads to our users based on their visit to our Site and other sites on the Internet. You may **opt-out of the use of the DART cookie** by visiting the Google Ad and Content Network Privacy Policy at the following URL: <a href="http://www.google.com/privacy_ads.html" class="text-blue-600 hover:underline" target="_blank">http://www.google.com/privacy_ads.html</a>. Alternatively, you can opt-out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="http://www.aboutads.info/choices/" class="text-blue-600 hover:underline" target="_blank">www.aboutads.info/choices/</a>.</p>
+            <p class="mb-4">Please note that other third-party vendors and ad networks may also be serving ads on our site. We recommend visiting their respective websites for more information about their privacy policies and how to opt-out of their practices.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">5. Data Protection and Security</h2>
+            <p class="mb-4">Fixway is committed to protecting your data. We implement a variety of robust administrative, technical, and physical security measures designed to ensure the confidentiality, integrity, and availability of your personal information. These measures include, but are not limited to, data encryption, secure server infrastructure, access controls, and regular security audits. While we strive to use commercially acceptable means to protect your personal data, please be aware that despite our best efforts, no security measures are perfect or impenetrable, and no method of data transmission over the Internet or method of electronic storage can be guaranteed to be 100% secure. We continuously review and update our security practices to guard against unauthorized access, disclosure, alteration, or destruction of your data.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">6. Cookies and Tracking Technologies</h2>
+            <p class="mb-4">We use **cookies** and similar tracking technologies (like web beacons and pixels) to access or store information. Specific information about how we use such technologies and how you can refuse certain cookies is set out in this section. Cookies are small data files placed on your device. They help us understand how the Site is used, improve user experience, and deliver personalized content and advertisements. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Site.</p>
+            <p class="mb-4">We use the following types of cookies:</p>
+            <ul class="list-disc list-inside ml-4">
+                <li>**Essential Cookies:** Necessary for the Site to function and cannot be switched off in our systems.</li>
+                <li>**Performance and Functionality Cookies:** Used to enhance the performance and functionality of our Site but are non-essential to their use.</li>
+                <li>**Analytics and Customization Cookies:** Collect information that is used either in aggregate form to help us understand how our Site is being used or how effective our marketing campaigns are, or to help us customize our Site for you.</li>
+                <li>**Advertising Cookies:** Used to make advertising messages more relevant to you. They perform functions like preventing the same ad from continuously reappearing, ensuring that ads are properly displayed for advertisers, and in some cases selecting advertisements that are based on your interests.</li>
+            </ul>
+            <p class="mb-4">For more detailed information on how to manage cookies, please refer to your browser's help documentation or settings.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">7. Your Privacy Rights</h2>
+            <p class="mb-4">Depending on your location and applicable data protection laws, you may have the following rights regarding your personal data:</p>
+            <ul class="list-disc list-inside ml-4">
+                <li>**The right to access:** You have the right to request copies of your personal data that we hold.</li>
+                <li>**The right to rectification:** You have the right to request that we correct any information you believe is inaccurate or complete information you believe is incomplete.</li>
+                <li>**The right to erasure ("Right to be forgotten"):** You have the right to request that we erase your personal data, under certain conditions, such as when the data is no longer necessary for the purposes for which it was collected.</li>
+                <li>**The right to restrict processing:** You have the right to request that we restrict the processing of your personal data, under certain conditions, such as when you contest the accuracy of the data.</li>
+                <li>**The right to object to processing:** You have the right to object to our processing of your personal data, under certain conditions, particularly when the processing is based on legitimate interests or for direct marketing.</li>
+                <li>**The right to data portability:** You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions, where technically feasible.</li>
+                <li>**The right to withdraw consent:** If we are relying on your consent to process your personal information, you have the right to withdraw your consent at any time.</li>
+            </ul>
+            <p class="mb-4">To exercise any of these rights, please contact us using the details provided in the "Contact Us" section below. We will respond to your request in accordance with applicable data protection laws.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">8. Third-Party Websites</h2>
+            <p class="mb-4">The Site may contain links to third-party websites and applications of interest, including advertisements and external services that are not affiliated with us. Once you have used these links to leave our Site, any information you provide to these third parties is not covered by this Privacy Policy, and we cannot guarantee the safety and privacy of your information. Before visiting and providing any information to any third-party websites, you should inform yourself of the privacy policies and practices (if any) of the third party responsible for that website, and should take those steps necessary to, in your discretion, protect the privacy of your information. We are not responsible for the content or privacy and security practices and policies of any third parties, including other sites, services or applications that may be linked to or from the Site.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">9. Policy for Children</h2>
+            <p class="mb-4">We do not knowingly solicit information from or market to children under the age of 13. If you become aware of any data we have collected from children under age 13, please contact us using the contact information provided below. If we learn that we have collected personal information from a child under age 13 without verification of parental consent, we will take steps to remove that information from our servers as quickly as possible.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">10. Updates to This Privacy Policy</h2>
+            <p class="mb-4">We may update this Privacy Policy from time to time in order to reflect, for example, changes to our practices or for other operational, legal, or regulatory reasons. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top of this Privacy Policy. You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+        </section>
+
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">11. Contact Us</h2>
+            <p class="mb-4">If you have questions or comments about this Privacy Policy, please contact us at:</p>
+            <p class="font-bold">Fixway Support</p>
+            <p>Email: support@fixway.com</p>
+            <p>Address: [Your Company Address Here]</p>
+            <p class="text-sm text-gray-500 mt-2">Please replace "[Your Company Address Here]" with your actual physical address if you have one, or remove the line if you operate solely online and do not have a public physical address.</p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Fixway. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="{{ url_for('contact_page') }}">Contact Us</a>
+        </div>
+        <img src="{{ url_for('static', filename='SriLanka.png') }}" alt="Flag of Sri Lanka" class="sri-lankan-flag" onerror="this.onerror=null;this.src='https://placehold.co/60x30/cccccc/000000?text=Flag'">
+    </footer>
+
+    <div id="loginModal" class="hidden fixed inset-0 z-[1001] w-full h-full overflow-auto bg-black bg-opacity-60 animate-fade-in flex items-center justify-center">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-sm relative animate-fade-in flex flex-col gap-4">
+            <span class="text-gray-400 absolute top-4 right-5 text-3xl font-bold cursor-pointer transition-colors duration-200 ease-in-out hover:text-gray-700" onclick="closeModal()">&times;</span>
+            <h3 class="text-2xl text-gray-800 mb-5">Login to Fixway</h3>
+
+            <button class="flex items-center justify-center gap-2.5 px-5 py-3 rounded-lg text-base cursor-pointer transition-all duration-300 ease-in-out border border-gray-300 text-gray-800 bg-red-600 text-white border-red-600 hover:bg-red-700 hover:shadow-md" id="googleLoginBtn">
+                <i class="fab fa-google"></i> Continue with Google
+            </button>
+            <button class="flex items-center justify-center gap-2.5 px-5 py-3 rounded-lg text-base cursor-pointer transition-all duration-300 ease-in-out border border-gray-300 text-gray-800 bg-blue-700 text-white border-blue-700 hover:bg-blue-800 hover:shadow-md" id="facebookLoginBtn">
+                <i class="fab fa-facebook-f"></i> Continue with Facebook
+            </button>
+
+            <div class="flex items-center text-center text-gray-500 my-5 before:content-[''] before:flex-1 before:border-b before:border-gray-300 after:content-[''] after:flex-1 after:border-b after:border-gray-300 before:mr-2 after:ml-2">OR</div>
+
+            <input type="email" id="loginEmail" placeholder="Email address" class="w-full px-4 py-3 mb-4 border border-gray-300 rounded-lg box-border text-base">
+            <input type="password" id="loginPassword" placeholder="Password" class="w-full px-4 py-3 mb-4 border border-gray-300 rounded-lg box-border text-base">
+
+            <button type="submit" id="emailLoginBtn" class="bg-blue-600 text-white px-5 py-3 border-none rounded-lg text-lg cursor-pointer transition-colors duration-300 ease-in-out w-full hover:bg-blue-700">Log In</button>
+            <div id="loginStatus" class="mt-4 text-sm text-gray-600"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            signInWithCustomToken,
+            GoogleAuthProvider,
+            FacebookAuthProvider,
+            signInWithPopup,
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Sign in using the provided token or anonymously
+        async function authenticateFirebase() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Signed in anonymously.");
+                }
+            } catch (error) {
+                console.error("Firebase authentication error:", error);
+            }
+        }
+
+        // Authenticate Firebase when the script loads
+        authenticateFirebase();
+
+        // Get modal elements
+        const loginModal = document.getElementById('loginModal');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const loginStatusDiv = document.getElementById('loginStatus');
+
+        // Functions to open and close the modal (made globally accessible for onclick attributes)
+        window.openModal = function() {
+            loginModal.style.display = 'flex'; // Use flex to center
+            loginStatusDiv.textContent = ''; // Clear previous messages
+        }
+
+        window.closeModal = function() {
+            loginModal.style.display = 'none';
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            if (event.target == loginModal) {
+                closeModal();
+            }
+        }
+
+        // Firebase Login Handlers
+        googleLoginBtn.addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                loginStatusDiv.textContent = 'Logged in with Google successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Google login error:", error);
+                loginStatusDiv.textContent = `Google login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        facebookLoginBtn.addEventListener('click', async () => {
+            const provider = new FacebookAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                loginStatusDiv.textContent = 'Logged in with Facebook successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Facebook login error:", error);
+                loginStatusDiv.textContent = `Facebook login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+
+        emailLoginBtn.addEventListener('click', async () => {
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+
+            if (!email || !password) {
+                loginStatusDiv.textContent = 'Please enter both email and password.';
+                loginStatusDiv.className = 'error';
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                loginStatusDiv.textContent = 'Logged in successfully!';
+                loginStatusDiv.className = 'success';
+                setTimeout(closeModal, 1500);
+            } catch (error) {
+                console.error("Email/Password login error:", error);
+                loginStatusDiv.textContent = `Login failed: ${error.message}`;
+                loginStatusDiv.className = 'error';
+            }
+        });
+    </script>
+</body>
+</html>
